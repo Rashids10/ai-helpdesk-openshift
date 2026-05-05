@@ -1,0 +1,43 @@
+:host {
+  display: block;
+  min-height: 100vh;
+  color: var(--text-soft);
+  background:
+    radial-gradient(circle at top left, rgba(59, 130, 246, 0.14), transparent 28%),
+    radial-gradient(circle at 80% 20%, rgba(96, 165, 250, 0.1), transparent 26%),
+    linear-gradient(135deg, var(--app-bg-start) 0%, var(--app-bg-end) 100%);
+}
+
+.app-layout {
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  gap: 24px;
+  padding: 24px;
+  box-sizing: border-box;
+}
+
+.app-layout__main {
+  min-width: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.app-layout__content {
+  min-width: 0;
+  flex: 1;
+}
+
+@media (max-width: 1024px) {
+  .app-layout {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 720px) {
+  .app-layout {
+    padding: 16px;
+  }
+}
