@@ -1,0 +1,211 @@
+<main class="signup-page">
+  <section class="panel" aria-label="Sign up form">
+    <div class="brand-row" aria-label="AI DESKHELP brand">
+      <div class="brand-mark" aria-hidden="true">
+        <span>AD</span>
+      </div>
+      <div class="brand-copy">
+        <p class="brand">AI DESKHELP</p>
+        <p class="brand-subtitle">Secure support, faster answers.</p>
+      </div>
+    </div>
+
+    <h1>Create your account</h1>
+    <p class="summary">
+      Register once to create support tickets, track progress, and use the AI helpdesk.
+    </p>
+    <p class="supporting-line">Get AI-assisted support and ticket tracking in one place.</p>
+
+    <div class="feature-list" aria-label="Benefits">
+      <article class="feature">
+        <h2>Fast setup</h2>
+        <p>Email, username, and password only.</p>
+      </article>
+      <article class="feature">
+        <h2>Ticket ready</h2>
+        <p>Start using the helpdesk flow immediately after sign up.</p>
+      </article>
+      <article class="feature">
+        <h2>Token support</h2>
+        <p>Any returned access token is stored in localStorage.</p>
+      </article>
+    </div>
+
+    <div class="panel-header">
+      <p class="panel-kicker">New account</p>
+      <h2>Sign up</h2>
+    </div>
+
+    <form class="form" [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+      <label class="field">
+        <span>Email</span>
+        <input
+          type="email"
+          formControlName="email"
+          placeholder="name@company.com"
+          autocomplete="email"
+          [class.invalid]="email.touched && email.invalid"
+          [attr.aria-invalid]="email.touched && email.invalid"
+        />
+      </label>
+      @if (emailServerError) {
+        <p class="field-error" role="alert">{{ emailServerError }}</p>
+      }
+      @if (email.touched && email.hasError('required')) {
+        <p class="field-error">Email is required.</p>
+      }
+      @if (email.touched && email.hasError('email')) {
+        <p class="field-error">Enter a valid email address.</p>
+      }
+
+      <label class="field">
+        <span>Username</span>
+        <input
+          type="text"
+          formControlName="username"
+          placeholder="your name"
+          autocomplete="username"
+          [class.invalid]="username.touched && username.invalid"
+          [attr.aria-invalid]="username.touched && username.invalid"
+        />
+      </label>
+      @if (username.touched && username.hasError('required')) {
+        <p class="field-error">Username is required.</p>
+      }
+      @if (username.touched && username.hasError('minlength')) {
+        <p class="field-error">Username must be at least 3 characters.</p>
+      }
+      @if (username.touched && username.hasError('maxlength')) {
+        <p class="field-error">Username must be 20 characters or fewer.</p>
+      }
+
+      <label class="field">
+        <span>Password</span>
+        <div class="password-field">
+          <input
+            [type]="passwordInputType"
+            formControlName="password"
+            placeholder="Create a password"
+            autocomplete="new-password"
+            [class.invalid]="password.touched && password.invalid"
+            [attr.aria-invalid]="password.touched && password.invalid"
+          />
+          <button
+            type="button"
+            class="password-toggle"
+            (click)="togglePasswordVisibility()"
+            [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'"
+            [attr.aria-pressed]="showPassword"
+          >
+            @if (showPassword) {
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path
+                  d="M4.5 4.5 19.5 19.5M10.58 10.58a3 3 0 0 0 4.24 4.24m2.37-2.34a4.96 4.96 0 0 0 .94-1.18 9.9 9.9 0 0 0-8.13-4.3c-.95 0-1.87.14-2.73.4"
+                />
+                <path
+                  d="M9.88 6.22A10.6 10.6 0 0 1 12 6c4.2 0 7.67 2.4 9.5 6-1.18 2.31-2.89 4.06-4.9 5.18"
+                />
+                <path
+                  d="M6.8 8.3C4.82 9.42 3.2 11.16 2.5 12c1.86 3.6 5.33 6 9.5 6 .78 0 1.54-.08 2.28-.23"
+                />
+              </svg>
+            } @else {
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path
+                  d="M2.5 12s3.2-6 9.5-6 9.5 6 9.5 6-3.2 6-9.5 6-9.5-6-9.5-6Z"
+                />
+                <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
+              </svg>
+            }
+          </button>
+        </div>
+      </label>
+      @if (password.touched && password.hasError('required')) {
+        <p class="field-error">Password is required.</p>
+      }
+      @if (password.touched && password.hasError('minlength')) {
+        <p class="field-error">Password must be at least 6 characters.</p>
+      }
+      @if (password.touched && password.hasError('maxlength')) {
+        <p class="field-error">Password must be 60 characters or fewer.</p>
+      }
+      <p class="field-hint">Use 6 to 60 characters. Longer passwords are stronger.</p>
+
+      <label class="field">
+        <span>Confirm Password</span>
+        <div class="password-field">
+          <input
+            [type]="confirmPasswordInputType"
+            formControlName="confirmPassword"
+            placeholder="Confirm your password"
+            autocomplete="new-password"
+            [class.invalid]="
+              confirmPassword.touched &&
+              (confirmPassword.invalid || form.hasError('passwordMismatch'))
+            "
+            [attr.aria-invalid]="
+              confirmPassword.touched &&
+              (confirmPassword.invalid || form.hasError('passwordMismatch'))
+            "
+          />
+          <button
+            type="button"
+            class="password-toggle"
+            (click)="toggleConfirmPasswordVisibility()"
+            [attr.aria-label]="showConfirmPassword ? 'Hide confirm password' : 'Show confirm password'"
+            [attr.aria-pressed]="showConfirmPassword"
+          >
+            @if (showConfirmPassword) {
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path
+                  d="M4.5 4.5 19.5 19.5M10.58 10.58a3 3 0 0 0 4.24 4.24m2.37-2.34a4.96 4.96 0 0 0 .94-1.18 9.9 9.9 0 0 0-8.13-4.3c-.95 0-1.87.14-2.73.4"
+                />
+                <path
+                  d="M9.88 6.22A10.6 10.6 0 0 1 12 6c4.2 0 7.67 2.4 9.5 6-1.18 2.31-2.89 4.06-4.9 5.18"
+                />
+                <path
+                  d="M6.8 8.3C4.82 9.42 3.2 11.16 2.5 12c1.86 3.6 5.33 6 9.5 6 .78 0 1.54-.08 2.28-.23"
+                />
+              </svg>
+            } @else {
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path
+                  d="M2.5 12s3.2-6 9.5-6 9.5 6 9.5 6-3.2 6-9.5 6-9.5-6-9.5-6Z"
+                />
+                <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
+              </svg>
+            }
+          </button>
+        </div>
+      </label>
+      @if (confirmPassword.touched && confirmPassword.hasError('required')) {
+        <p class="field-error">Confirm Password is required.</p>
+      }
+      @if ((confirmPassword.touched || form.touched) && form.hasError('passwordMismatch')) {
+        <p class="field-error">Passwords do not match</p>
+      }
+
+      @if (errorMessage) {
+        <p class="form-error" role="alert">{{ errorMessage }}</p>
+      }
+
+      @if (successMessage) {
+        <p class="form-success" role="status" aria-live="polite">{{ successMessage }}</p>
+      }
+
+      <button class="submit-button" type="submit" [disabled]="isSubmitting || form.invalid">
+        @if (isSubmitting) {
+          <span class="button-spinner" aria-hidden="true"></span>
+          <span>Creating account...</span>
+        } @else {
+          Sign up
+        }
+      </button>
+    </form>
+
+    <p class="footer-copy">
+      Already have an account?
+      <a routerLink="/login">Go to login</a>
+    </p>
+  </section>
+</main>
