@@ -31,7 +31,9 @@ jobs:
       - name: Build project # Name des Schritts
         working-directory: backend
         run: mvn clean install -DskipTests
+
        # run: mvn clean install # Führt Maven Build aus (kompilieren + testen + jar bauen)
+       #just testing
        
 
 
