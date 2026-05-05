@@ -1,0 +1,25 @@
+name: Backend Pipeline   # Name der Pipeline (wird in GitHub angezeigt)
+
+on:                      # Wann soll die Pipeline starten?
+  push:                  # Bei jedem Push
+  pull_request:          # Bei jedem Pull Request
+    branches: [ main ]   # Nur wenn PR auf main geht
+
+jobs:                    # Hier definierst du alle Jobs (Abläufe)
+  compile:               # Name des Jobs (frei wählbar)
+    runs-on: ubuntu-latest   # Auf welcher Maschine läuft der Job (Linux VM von GitHub)
+    name: Compile project    # Anzeigename in GitHub UI
+
+    steps:               # Liste von Schritten innerhalb des Jobs
+
+      - name: Checkout code   # Name des Schritts (nur Anzeige)
+        uses: actions/checkout@v4   # Holt dein Repo in die Pipeline (git clone) 
+
+      - name: Setup Java      # Name des Schritts
+        uses: actions/setup-java@v4   # Installiert Java auf der VM
+        with:                 # Konfiguration für diese Action
+          java-version: '21'  # Welche Java Version installiert werden soll
+          distribution: 'temurin'   # Welche Java Variante (OpenJDK von Eclipse)
+
+      - name: Build project   # Name des Schritts
+        run: mvn clean install   # Führt Maven Build aus (kompilieren + testen + jar bauen)
