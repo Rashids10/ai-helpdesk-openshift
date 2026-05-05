@@ -31,4 +31,15 @@ jobs:
 
       - name: Build project # Name des Schritts
         working-directory: backend
-        run: mvn clean install # Führt Maven Build aus (kompilieren + testen + jar bauen)
+   
+       # run: mvn clean install # Führt Maven Build aus (kompilieren + testen + jar bauen)
+        run: mvn clean install -DskipTest
+
+
+
+
+# run:            Führt einen Terminal-Befehl in der Pipeline aus
+# mvn             Startet Maven (Build-Tool für dein Spring Boot Projekt)
+# clean           Löscht alte Build-Artefakte (z.B. target/ Ordner)
+# install         Baut das Projekt, führt normalerweise Tests aus und erstellt das .jar
+# -DskipTests     Überspringt die Tests (wichtig in CI, wenn keine DB vorhanden ist)
