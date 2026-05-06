@@ -22,7 +22,7 @@ public class TicketEntity {
 
     @ManyToOne
     @JoinColumn(name = "created_by", nullable = false)
-    private UserEntity user;
+    private Long createdBy;
 
     @Column(name = "title", nullable = false)
     private String title;
@@ -46,8 +46,8 @@ public class TicketEntity {
     }
 
 
-    public UserEntity getUser() {
-        return user;
+    public Long createdBy() {
+        return createdBy;
     }
 
 
@@ -61,8 +61,8 @@ public class TicketEntity {
     }
 
 
-    public void setUser(UserEntity user) {
-        this.user = user;
+    public void setCreatedBy(Long createdBy) {
+        this.createdBy = createdBy;
     }
 
 
