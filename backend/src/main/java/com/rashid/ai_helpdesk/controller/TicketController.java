@@ -41,12 +41,7 @@ public class TicketController {
         this.ticketServiceImpl = ticketServiceImpl;
     }
 
-    @GetMapping("/getTicket")
-
-    public TicketEntity getTicket() {
-        return ticketServiceImpl.findTicketById(this.logedInUserId);
-
-    }
+ 
 
     @PostMapping("/createTicket")
     public ResponseEntity<?> createTicket(

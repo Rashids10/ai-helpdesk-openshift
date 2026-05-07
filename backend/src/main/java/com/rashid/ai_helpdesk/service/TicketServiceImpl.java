@@ -1,7 +1,6 @@
 package com.rashid.ai_helpdesk.service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -16,7 +15,6 @@ import jakarta.transaction.Transactional;
 @Service
 public class TicketServiceImpl implements TicketService {
 
-    private List<Option> loadTicket = new ArrayList<>();
     private final TicketRepo ticketRepo;
 
 
