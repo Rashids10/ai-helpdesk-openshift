@@ -23,9 +23,8 @@ import com.rashid.ai_helpdesk.payload.response.MessageResponse;
 import com.rashid.ai_helpdesk.security.jwt.JwtUtils;
 import com.rashid.ai_helpdesk.security.jwt.UserDetailsImpl;
 import com.rashid.ai_helpdesk.service.UserDetailsServiceImpl;
+
 import io.swagger.v3.oas.annotations.Operation;
-
-
 import jakarta.validation.Valid;
 
 @RestController
@@ -81,6 +80,7 @@ public class AuthController {
                             userDetails.getUsername(),
                             userDetails.getEmail(),
                             List.of("ROLE_USER")));
+                            
         } catch (AuthenticationException ex) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(new MessageResponse("Invalid username/email or password."));

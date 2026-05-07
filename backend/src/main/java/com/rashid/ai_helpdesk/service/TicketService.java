@@ -22,5 +22,6 @@ public interface TicketService {
     void updateTicketStatus(Long ticketId, Status status);
 
     void deleteTicket(Long ticketId);
+    
 
 }
