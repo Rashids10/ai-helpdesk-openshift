@@ -1,0 +1,65 @@
+<section class="ticket-page">
+  <article class="panel">
+    <div class="panel-copy">
+      <p class="eyebrow">Ticket workspace</p>
+      <h1>Create a ticket</h1>
+      <p class="summary">
+        Enter a title and description, then submit the ticket for the logged-in user.
+      </p>
+    </div>
+
+    <form class="form" [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+      <label class="field">
+        <span>Title</span>
+        <input
+          type="text"
+          formControlName="title"
+          placeholder="Short issue summary"
+          autocomplete="off"
+          [class.invalid]="title.touched && title.invalid"
+          [attr.aria-invalid]="title.touched && title.invalid"
+        />
+      </label>
+      @if (title.touched && title.hasError('required')) {
+        <p class="field-error">Title is required.</p>
+      }
+      @if (title.touched && title.hasError('maxlength')) {
+        <p class="field-error">Title must be 120 characters or fewer.</p>
+      }
+
+      <label class="field">
+        <span>Description</span>
+        <textarea
+          rows="7"
+          formControlName="description"
+          placeholder="Describe the issue or request"
+          [class.invalid]="description.touched && description.invalid"
+          [attr.aria-invalid]="description.touched && description.invalid"
+        ></textarea>
+      </label>
+      @if (description.touched && description.hasError('required')) {
+        <p class="field-error">Description is required.</p>
+      }
+      @if (description.touched && description.hasError('maxlength')) {
+        <p class="field-error">Description must be 2000 characters or fewer.</p>
+      }
+
+      @if (errorMessage) {
+        <p class="form-error" role="alert">{{ errorMessage }}</p>
+      }
+
+      @if (successMessage) {
+        <p class="form-success" role="status" aria-live="polite">{{ successMessage }}</p>
+      }
+
+      <button class="submit-button" type="submit" [disabled]="isSubmitting || form.invalid">
+        @if (isSubmitting) {
+          <span class="button-spinner" aria-hidden="true"></span>
+          <span>Creating ticket...</span>
+        } @else {
+          Create Ticket
+        }
+      </button>
+    </form>
+  </article>
+</section>
