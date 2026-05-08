@@ -1,13 +1,8 @@
-import { Component, inject } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { ReactiveFormsModule, Validators } from '@angular/forms';
 import { FormBuilder } from '@angular/forms';
-
-interface TicketCreateResponse {
-  message?: string;
-  [key: string]: unknown;
-}
-
-const TICKET_ENDPOINT = 'http://localhost:8089/api/ticket/createTicket';
+import { Subscription } from 'rxjs';
+import { HelpdeskApiService, TicketListItem } from '../../api/helpdesk-api.service';
 
 @Component({
   selector: 'app-ticket-create-page',
@@ -16,8 +11,10 @@ const TICKET_ENDPOINT = 'http://localhost:8089/api/ticket/createTicket';
   templateUrl: './ticket-create-page.component.html',
   styleUrl: './ticket-create-page.component.css',
 })
-export class TicketCreatePageComponent {
+export class TicketCreatePageComponent implements OnInit, OnDestroy {
   private readonly formBuilder = inject(FormBuilder);
+  private readonly api = inject(HelpdeskApiService);
+  private readonly subscriptions = new Subscription();
 
   protected readonly form = this.formBuilder.nonNullable.group({
     title: ['', [Validators.required, Validators.maxLength(120)]],
@@ -27,6 +24,9 @@ export class TicketCreatePageComponent {
   protected isSubmitting = false;
   protected successMessage = '';
   protected errorMessage = '';
+  protected isLoadingTickets = true;
+  protected ticketsErrorMessage = '';
+  protected tickets: TicketListItem[] = [];
 
   protected get title() {
     return this.form.controls.title;
@@ -34,6 +34,16 @@ export class TicketCreatePageComponent {
 
   protected get description() {
     return this.form.controls.description;
+  }
+
+  ngOnInit(): void {
+    this.subscriptions.add(
+      this.api.ticketsChanged$.subscribe(() => {
+        void this.loadTickets();
+      }),
+    );
+
+    void this.loadTickets();
   }
 
   protected async onSubmit(): Promise<void> {
@@ -48,19 +58,16 @@ export class TicketCreatePageComponent {
 
     try {
       const { title, description } = this.form.getRawValue();
-      const response = await fetch(TICKET_ENDPOINT, {
-        method: 'POST',
-        headers: this.buildHeaders(),
-        body: JSON.stringify({
-          title: title.trim(),
-          description: description.trim(),
-        }),
+      const { response, body } = await this.api.createTicket({
+        title: title.trim(),
+        description: description.trim(),
       });
 
-      const body = await this.safeJson(response);
-
       if (!response.ok) {
-        this.errorMessage = this.extractErrorMessage(body);
+        this.errorMessage = this.api.extractErrorMessage(
+          body,
+          'Ticket creation failed. Please try again.',
+        );
         return;
       }
 
@@ -71,64 +78,46 @@ export class TicketCreatePageComponent {
       });
       this.form.markAsPristine();
       this.form.markAsUntouched();
+      this.api.notifyTicketsChanged();
     } catch (error) {
-      this.errorMessage = this.extractErrorMessage(error);
+      this.errorMessage = this.api.extractErrorMessage(
+        error,
+        'Ticket creation failed. Please try again.',
+      );
     } finally {
       this.isSubmitting = false;
     }
   }
 
-  private buildHeaders(): HeadersInit {
-    const headers: Record<string, string> = {
-      'Content-Type': 'application/json',
-    };
-    const token = localStorage.getItem('accessToken');
-
-    if (token) {
-      headers['Authorization'] = `Bearer ${token}`;
-    }
-
-    return headers;
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
   }
 
-  private async safeJson(response: Response): Promise<TicketCreateResponse | null> {
+  private async loadTickets(): Promise<void> {
+    this.isLoadingTickets = true;
+    this.ticketsErrorMessage = '';
+
     try {
-      return (await response.json()) as TicketCreateResponse;
-    } catch {
-      return null;
-    }
-  }
+      const result = await this.api.getMyTickets();
 
-  private extractErrorMessage(error: unknown): string {
-    const fallback = 'Ticket creation failed. Please try again.';
-
-    if (!error || typeof error !== 'object') {
-      return fallback;
-    }
-
-    const typedError = error as {
-      error?: { message?: unknown } | unknown;
-      message?: unknown;
-    };
-
-    if (typedError.error && typeof typedError.error === 'object') {
-      const backendMessage = (typedError.error as { message?: unknown }).message;
-      if (typeof backendMessage === 'string' && backendMessage.trim()) {
-        return backendMessage;
+      if (!result.response.ok) {
+        this.tickets = [];
+        this.ticketsErrorMessage = this.api.extractErrorMessage(
+          result.body,
+          'Could not load your tickets.',
+        );
+        return;
       }
-    }
 
-    if (typeof typedError.message === 'string' && typedError.message.trim()) {
-      return typedError.message;
+      this.tickets = result.tickets;
+    } catch (error) {
+      this.tickets = [];
+      this.ticketsErrorMessage = this.api.extractErrorMessage(
+        error,
+        'Could not load your tickets.',
+      );
+    } finally {
+      this.isLoadingTickets = false;
     }
-
-    if (typeof (error as TicketCreateResponse).message === 'string') {
-      const backendMessage = (error as TicketCreateResponse).message;
-      if (backendMessage?.trim()) {
-        return backendMessage;
-      }
-    }
-
-    return fallback;
   }
 }

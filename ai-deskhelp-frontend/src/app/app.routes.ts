@@ -7,7 +7,7 @@ import { TicketCreatePageComponent } from './features/tickets/ticket-create-page
 import { SectionPageComponent } from './features/section-page/section-page.component';
 
 export const routes: Routes = [
-  { path: '', pathMatch: 'full', redirectTo: 'signup' },
+  { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
   { path: 'signup', component: SignupPageComponent },
   { path: 'login', component: LoginPageComponent },
   {

@@ -35,10 +35,11 @@ public class JwtUtils {
     private int jwtExpirationMs;
 
     public String generateJwtToken(Authentication authentication) {
-        String username = authentication.getName();
+        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+        String email = userDetails.getEmail();
 
         return Jwts.builder()
-                .setSubject(username)
+                .setSubject(email)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + jwtExpirationMs))
                 .signWith(key(), SignatureAlgorithm.HS256)

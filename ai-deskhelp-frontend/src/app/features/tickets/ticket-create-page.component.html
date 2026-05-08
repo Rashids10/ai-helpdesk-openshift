@@ -62,4 +62,57 @@
       </button>
     </form>
   </article>
+
+  <article class="card tickets-card">
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">Your tickets</p>
+        <h2>Recent activity</h2>
+      </div>
+    </div>
+
+    @if (ticketsErrorMessage) {
+      <p class="list-error" role="alert">{{ ticketsErrorMessage }}</p>
+    }
+
+    @if (isLoadingTickets) {
+      <p class="list-state">Loading tickets...</p>
+    } @else {
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Status</th>
+              <th>Created</th>
+            </tr>
+          </thead>
+          <tbody>
+            @if (tickets.length === 0) {
+              <tr>
+                <td colspan="3" class="empty-state">No tickets yet</td>
+              </tr>
+            } @else {
+              @for (ticket of tickets; track ticket.id) {
+                <tr>
+                  <td>{{ ticket.title }}</td>
+                  <td>
+                    <span
+                      class="pill"
+                      [class.success]="ticket.statusTone === 'success'"
+                      [class.warning]="ticket.statusTone === 'warning'"
+                      [class.neutral]="ticket.statusTone === 'neutral'"
+                    >
+                      {{ ticket.statusLabel }}
+                    </span>
+                  </td>
+                  <td>{{ ticket.createdAtLabel }}</td>
+                </tr>
+              }
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </article>
 </section>

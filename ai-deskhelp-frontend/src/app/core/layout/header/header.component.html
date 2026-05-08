@@ -5,10 +5,14 @@
   </div>
 
   <div class="user">
-    <div class="avatar" aria-hidden="true">AM</div>
+    <div class="avatar" aria-hidden="true">{{ avatarInitials }}</div>
     <div>
-      <p class="user-name">Alex Morgan</p>
-      <p class="user-role">Support Agent</p>
+      @if (isLoadingUsername) {
+        <p class="user-name">Loading...</p>
+      } @else {
+        <p class="user-name">{{ username }}</p>
+      }
+      <p class="user-role">{{ userRole }}</p>
     </div>
   </div>
 </header>

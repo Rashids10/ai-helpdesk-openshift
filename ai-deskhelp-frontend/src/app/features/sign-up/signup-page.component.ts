@@ -18,6 +18,7 @@ interface SignupResponse {
 }
 
 const SIGNUP_ENDPOINT = 'http://localhost:8089/api/auth/signup';
+const SIGNUP_REQUEST_TIMEOUT_MS = 5000;
 
 const passwordsMatchValidator: ValidatorFn = (
   control: AbstractControl,
@@ -116,9 +117,9 @@ export class SignupPageComponent implements OnDestroy {
         localStorage.setItem('accessToken', token);
       }
 
-      this.successMessage = 'Account created successfully. Redirecting to login...';
+      this.successMessage = 'Account created successfully. Redirecting to dashboard...';
       this.redirectTimeoutId = setTimeout(() => {
-        void this.router.navigate(['/login'], { replaceUrl: true });
+        void this.router.navigate(['/dashboard'], { replaceUrl: true });
       }, 900);
     } catch (error) {
       const backendMessage = this.extractErrorMessage(error);
@@ -149,17 +150,25 @@ export class SignupPageComponent implements OnDestroy {
     username: string;
     password: string;
   }): Promise<{ response: Response; body: SignupResponse | null }> {
-    const response = await fetch(SIGNUP_ENDPOINT, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(payload),
-    });
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), SIGNUP_REQUEST_TIMEOUT_MS);
 
-    const body = await this.safeJson(response);
+    try {
+      const response = await fetch(SIGNUP_ENDPOINT, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+        signal: controller.signal,
+      });
 
-    return { response, body };
+      const body = await this.safeJson(response);
+
+      return { response, body };
+    } finally {
+      clearTimeout(timeoutId);
+    }
   }
 
   private async safeJson(response: Response): Promise<SignupResponse | null> {
