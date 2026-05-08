@@ -1,25 +1,27 @@
 package com.rashid.ai_helpdesk.service;
 
-public class TicketService {
+import java.util.List;
+
+import com.rashid.ai_helpdesk.entity.Status;
+import com.rashid.ai_helpdesk.entity.TicketEntity;
+
+public interface TicketService {
+
+    TicketEntity createTicket(
+        Long creatBy,
+        String title,
+        String description
+    );
 
 
-    public Ticket createTicket(String quesition, Long ticketId, String title, Long createdBy, String comment) {
-       Ticket ticket = new Ticket(ticketId, title, createdBy, comment);
-       return ticket;
-    }
+    
+    TicketEntity findTicketById(Long ticketId);
 
+    List<TicketEntity> findAllTickets();
 
+    void updateTicketStatus(Long ticketId, Status status);
 
-    public Ticket gTicket(Long ticketId){
-        return null;
-    }
+    void deleteTicket(Long ticketId);
+    
 
-    public Ticket findAnswer(Long ticketId){
-        /*
-        hier wird RAG AUF gerufen und die Antwort zurückgegeben und wenn nciht dann wird ein ticket erstellt
-        r
-    }
-         */
-        return null;
-    }
 }

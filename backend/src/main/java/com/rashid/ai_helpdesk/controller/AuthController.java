@@ -9,8 +9,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,19 +23,18 @@ import com.rashid.ai_helpdesk.payload.response.MessageResponse;
 import com.rashid.ai_helpdesk.security.jwt.JwtUtils;
 import com.rashid.ai_helpdesk.security.jwt.UserDetailsImpl;
 import com.rashid.ai_helpdesk.service.UserDetailsServiceImpl;
+
 import io.swagger.v3.oas.annotations.Operation;
-
-
 import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin(origins = "*", maxAge = 3600)
 public class AuthController {
 
     private final AuthenticationManager authenticationManager;
     private final JwtUtils jwtUtils;
     private final UserDetailsServiceImpl userDetailsService;
+    
 
     public AuthController(
             AuthenticationManager authenticationManager,
@@ -58,10 +57,28 @@ public class AuthController {
                 signUpRequest.getUsername(),
                 signUpRequest.getPassword());
 
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(new MessageResponse("User registered successfully."));
+Authentication authentication = authenticationManager.authenticate(
+    new UsernamePasswordAuthenticationToken(
+        signUpRequest.getEmail(),
+        signUpRequest.getPassword()
+    )
+);
+
+String jwt = jwtUtils.generateJwtToken(authentication);
+
+UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+
+return ResponseEntity.status(HttpStatus.CREATED)
+    .body(new JwtResponse(
+        jwt,
+        userDetails.getId(),
+        userDetails.getUsername(),
+        userDetails.getEmail(),
+        List.of("ROLE_USER")
+    ));
     }
 
+    
     @PostMapping("/login")
     @Operation(summary = "User anmelden", description = "Ermöglicht einem User, sich mit Email und Passwort einzuloggen")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
@@ -81,11 +98,15 @@ public class AuthController {
                             userDetails.getUsername(),
                             userDetails.getEmail(),
                             List.of("ROLE_USER")));
+                            
         } catch (AuthenticationException ex) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(new MessageResponse("Invalid username/email or password."));
         }
     }
+
+
+
 
     @DeleteMapping("/deletemyAccount")
     @Operation(
@@ -101,10 +122,6 @@ public class AuthController {
         boolean deleted = userDetailsService.deleteById(user.getId());
 
         if (deleted) {
-                    /*
-
-            später kannst du noch dazu zu loggout redirecten
-             */
             return ResponseEntity.ok(new MessageResponse("Your account was deleted successfully."));
 
 
@@ -113,4 +130,12 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(new MessageResponse("Account could not be deleted."));
     }
+
+
+@GetMapping("/logged-in-username")
+public ResponseEntity<String> getUsername(
+        @AuthenticationPrincipal UserDetailsImpl user) {
+
+    return ResponseEntity.ok(user.getUsername());
+}
 }

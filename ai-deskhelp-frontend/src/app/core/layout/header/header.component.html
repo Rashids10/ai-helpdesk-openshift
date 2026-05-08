@@ -1,0 +1,18 @@
+<header class="header card">
+  <div>
+    <p class="eyebrow">AI DESKHELP</p>
+    <h1>{{ title }}</h1>
+  </div>
+
+  <div class="user">
+    <div class="avatar" aria-hidden="true">{{ avatarInitials }}</div>
+    <div>
+      @if (isLoadingUsername) {
+        <p class="user-name">Loading...</p>
+      } @else {
+        <p class="user-name">{{ username }}</p>
+      }
+      <p class="user-role">{{ userRole }}</p>
+    </div>
+  </div>
+</header>

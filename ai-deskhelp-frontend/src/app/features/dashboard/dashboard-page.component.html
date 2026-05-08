@@ -1,0 +1,88 @@
+<section class="dashboard-page">
+  <header class="hero card">
+    <div>
+      <p class="eyebrow">Dashboard overview</p>
+      <h1>Welcome back</h1>
+      <p class="subtitle">Track your support tickets and get AI-assisted help.</p>
+    </div>
+    <div class="hero-badge">Signed in</div>
+  </header>
+
+  @if (isLoading) {
+    <p class="list-state dashboard-state">Loading tickets...</p>
+  }
+
+  <section class="stats-grid" aria-label="Ticket summary">
+    @for (card of statCards; track card.label) {
+      <article class="stat card">
+        <p class="stat-label">{{ card.label }}</p>
+        <div class="stat-value">{{ card.value }}</div>
+        <p class="stat-note">{{ card.note }}</p>
+      </article>
+    }
+  </section>
+
+  <section class="workspace">
+    <article class="card tickets-card">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">Recent tickets</p>
+          <h2>Latest activity</h2>
+        </div>
+      </div>
+
+      @if (errorMessage) {
+        <p class="list-error" role="alert">{{ errorMessage }}</p>
+      }
+
+      @if (isLoading) {
+        <p class="list-state">Loading tickets...</p>
+      } @else {
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Title</th>
+                <th>Status</th>
+                <th>Created</th>
+              </tr>
+            </thead>
+            <tbody>
+              @if (!hasTickets) {
+                <tr>
+                  <td colspan="3" class="empty-state">No tickets yet</td>
+                </tr>
+              } @else {
+                @for (ticket of tickets; track ticket.id) {
+                  <tr>
+                    <td>{{ ticket.title }}</td>
+                    <td>
+                      <span
+                        class="pill"
+                        [class.success]="ticket.statusTone === 'success'"
+                        [class.warning]="ticket.statusTone === 'warning'"
+                        [class.neutral]="ticket.statusTone === 'neutral'"
+                      >
+                        {{ ticket.statusLabel }}
+                      </span>
+                    </td>
+                    <td>{{ ticket.createdAtLabel }}</td>
+                  </tr>
+                }
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </article>
+
+    <article class="card helper-card">
+      <p class="eyebrow">AI helper</p>
+      <h2>Need help?</h2>
+      <p>
+        Ask the AI assistant to find answers, summarize ticket context, or suggest the next step.
+      </p>
+      <button type="button" class="assistant-button">Ask AI Assistant</button>
+    </article>
+  </section>
+</section>

@@ -1,1 +1,44 @@
-/* You can add global styles to this file, and also import other style files */
+:root {
+  --app-bg-start: #0f172a;
+  --app-bg-end: #1e293b;
+  --surface: rgba(17, 24, 39, 0.9);
+  --surface-strong: rgba(30, 41, 59, 0.9);
+  --surface-soft: rgba(30, 41, 59, 0.78);
+  --border: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(148, 163, 184, 0.22);
+  --text: #f8fafc;
+  --text-soft: #cbd5f5;
+  --text-muted: #94a3b8;
+  --accent: #3b82f6;
+  --accent-glow: rgba(59, 130, 246, 0.22);
+  --button-start: #6f9cf8;
+  --button-end: #3b82f6;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background:
+    radial-gradient(circle at top left, rgba(59, 130, 246, 0.12), transparent 28%),
+    radial-gradient(circle at 80% 20%, rgba(96, 165, 250, 0.08), transparent 26%),
+    linear-gradient(135deg, var(--app-bg-start) 0%, var(--app-bg-end) 100%);
+  color: var(--text-soft);
+  font-family: Inter, "Segoe UI", Arial, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+a {
+  color: inherit;
+}
+
+button,
+input {
+  font: inherit;
+}

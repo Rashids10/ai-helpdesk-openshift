@@ -1,0 +1,27 @@
+<aside class="sidebar">
+  <div>
+    <div class="brand-row" aria-label="AI DESKHELP brand">
+      <div class="brand-mark" aria-hidden="true">AD</div>
+      <div>
+        <p class="brand">AI DESKHELP</p>
+        <p class="brand-subtitle">Support workspace</p>
+      </div>
+    </div>
+
+    <nav class="nav" aria-label="Primary">
+      @for (item of navigationItems; track item.path) {
+        <a
+          class="nav-item"
+          routerLinkActive="active"
+          [routerLink]="item.path"
+          [routerLinkActiveOptions]="{ exact: true }"
+        >
+          <span class="nav-dot" aria-hidden="true"></span>
+          <span>{{ item.label }}</span>
+        </a>
+      }
+    </nav>
+  </div>
+
+  <button type="button" class="logout-button" (click)="logout()">Logout</button>
+</aside>
