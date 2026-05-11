@@ -22,6 +22,37 @@
         <jjwt.version>0.11.5</jjwt.version>
     </properties>
 
+    <repositories>
+
+        <!-- Spring Milestone Repository
+        notwendig weil Spring AI teilweise
+        noch nicht komplett in Maven Central liegt -->
+        <repository>
+            <id>spring-milestones</id>
+            <name>Spring Milestones</name>
+            <url>https://repo.spring.io/milestone</url>
+        </repository>
+
+    </repositories>
+
+    <!-- Verwaltet zentrale Spring-AI Versionen -->
+    <dependencyManagement>
+        <dependencies>
+
+            <!-- Spring AI BOM (Bill Of Materials)
+            sorgt dafür, dass alle Spring-AI Dependencies
+            kompatible Versionen nutzen -->
+            <dependency>
+                <groupId>org.springframework.ai</groupId>
+                <artifactId>spring-ai-bom</artifactId>
+                <version>1.0.0</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+        </dependencies>
+    </dependencyManagement>
+
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -76,12 +107,19 @@
             <artifactId>spring-security-test</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>test</scope>
+        </dependency>
 
         <dependency>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-devtools</artifactId>
-    <scope>runtime</scope>
-</dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
+
 
      
         <!-- Source: https://mvnrepository.com/artifact/org.webjars.bower/jquery -->
@@ -91,6 +129,41 @@
             <version>3.7.1</version>
             <scope>compile</scope>
         </dependency>
+
+        <!-- OpenAI Integration für Spring AI
+        damit kannst du:
+        - ChatGPT ansprechen
+        - Embeddings erzeugen
+        - RAG nutzen -->
+    <dependency>
+        <groupId>org.springframework.ai</groupId>
+        <artifactId>spring-ai-starter-model-openai</artifactId>
+    </dependency>
+
+        <!-- Transformer / Text Splitter Unterstützung
+        wird genutzt um:
+        - Dokumente aufzuteilen
+        - TextChunks zu erstellen
+        - besseres RAG zu ermöglichen -->
+        <dependency>
+            <groupId>org.springframework.ai</groupId>
+            <artifactId>spring-ai-transformers</artifactId>
+        </dependency>
+
+
+
+            <!-- Tika Reader: liest Dokumente wie PDF, Markdown, HTML, DOCX usw. -->
+    <dependency>
+        <groupId>org.springframework.ai</groupId>
+        <artifactId>spring-ai-tika-document-reader</artifactId>
+    </dependency>
+
+    <!-- SimpleVectorStore: lokaler VectorStore für Demo/MVP -->
+    <dependency>
+        <groupId>org.springframework.ai</groupId>
+        <artifactId>spring-ai-vector-store</artifactId>
+    </dependency>
+
     </dependencies>
 
     <build>
