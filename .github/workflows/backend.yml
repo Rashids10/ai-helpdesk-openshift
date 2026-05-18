@@ -1,6 +1,7 @@
 name: Backend Pipeline
 
 on:
+  # Run on feature branch pushes and PRs to main.
   push:
     branches:
       - feature/setup-ci-cd
@@ -9,6 +10,7 @@ on:
       - main
 
 permissions:
+  # Read-only token access.
   contents: read
 
 jobs:
@@ -17,6 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
+        # Execute backend commands from the backend/ directory.
         working-directory: backend
     steps:
       - name: Checkout code
@@ -28,4 +31,5 @@ jobs:
           distribution: "temurin"
           cache: maven
       - name: Build
+        # Skip tests in CI until test infrastructure is available.
         run: mvn clean install -DskipTests
