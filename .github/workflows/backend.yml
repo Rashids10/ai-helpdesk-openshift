@@ -31,5 +31,5 @@ jobs:
           distribution: "temurin"
           cache: maven
       - name: Build
-        # Skip tests in CI until test infrastructure is available.
+        # TODO: Enable tests when CI test infrastructure is available.
         run: mvn clean install -DskipTests
