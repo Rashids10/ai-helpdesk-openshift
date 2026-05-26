@@ -30,7 +30,7 @@ import com.rashid.ai_helpdesk.service.UserDetailsServiceImpl;
  */
 
 @Configuration
-public class SecurityConfig {
+public class SecurityConfig{
 
     private final AuthEntryPointJwt unauthorizedHandler;
     private final UserDetailsServiceImpl userDetailsService;
@@ -52,8 +52,9 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers(
+                        .requestMatchers(      // Diese Endpoints dürfen OHNE Login/JWT benutzt werden.
                                 "/api/auth/**",
+                                "/rag/ask",   
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
@@ -67,6 +68,7 @@ public class SecurityConfig {
 
         return http.build();
     }
+
 
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
@@ -85,6 +87,7 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
+    
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
@@ -98,4 +101,7 @@ public class SecurityConfig {
 
         return source;
     }
+
+
+
 }

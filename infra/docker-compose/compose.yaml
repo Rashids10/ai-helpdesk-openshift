@@ -10,7 +10,7 @@ services:
       POSTGRES_USER: rashid
       POSTGRES_PASSWORD: my-secret-pw
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
@@ -24,11 +24,10 @@ services:
       PGADMIN_DEFAULT_PASSWORD: admin
       
     ports:
-      - "8080:80"
+      - "8088:80"
 
 volumes:
   postgres_data:
-
 
 
 
