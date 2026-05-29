@@ -19,7 +19,7 @@ export class SidebarComponent {
   protected readonly navigationItems: NavigationItem[] = [
     { label: 'Dashboard', path: '/dashboard' },
     { label: 'Tickets', path: '/tickets' },
-    { label: 'AI Chat', path: '/chat' },
+    { label: 'AI Assistant', path: '/chat' },
     { label: 'Settings', path: '/settings' },
   ];
 

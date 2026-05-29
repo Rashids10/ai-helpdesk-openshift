@@ -55,6 +55,7 @@ public class SecurityConfig{
                         .requestMatchers(      // Diese Endpoints dürfen OHNE Login/JWT benutzt werden.
                                 "/api/auth/**",
                                 "/rag/ask",   
+                                "/rag/bot",  
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",

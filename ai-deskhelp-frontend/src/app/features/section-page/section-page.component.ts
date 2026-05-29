@@ -12,6 +12,7 @@ export class SectionPageComponent {
 
   protected readonly title = (this.route.snapshot.data['title'] as string | undefined) ?? 'Section';
   protected readonly eyebrow = (this.route.snapshot.data['eyebrow'] as string | undefined) ?? 'Workspace';
+  protected readonly showContentTitle = this.route.snapshot.data['showContentTitle'] !== false;
   protected readonly description =
     (this.route.snapshot.data['description'] as string | undefined) ??
     'This section uses the shared app layout and placeholder content for now.';

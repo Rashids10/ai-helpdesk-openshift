@@ -15,13 +15,20 @@ import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
+
 @SecurityRequirement(name = "bearerAuth")
 @RestController
 @RequestMapping("/rag")
 
-public class AskRagController {
+public class RagController {
 
     private final ChatClient chatModel;
+
+   
+    // private ChatBotService chatBotService;
+
+  
+
 
     @Autowired
     private EmbeddingModel embaEmbeddingModel;
@@ -29,12 +36,14 @@ public class AskRagController {
     @Autowired
     private VectorStore vectorStore;
 
-    public AskRagController(
+    public RagController(
             VectorStore vectorStore,
-            OllamaChatModel chatModel) {
+            OllamaChatModel chatModel
+      ) {
 
         this.vectorStore = vectorStore;
         this.chatModel = ChatClient.create(chatModel);
+   
     }
 
     @PostMapping("ask")
@@ -63,8 +72,8 @@ Frage:
         QuestionAnswerAdvisor.builder(vectorStore)
             .searchRequest(
                 SearchRequest.builder()
-                    .topK(1)
-                    .similarityThreshold(0.80)
+                    .topK(2)
+                    .similarityThreshold(0.7f)
                     .build()
             )
             .build()
@@ -75,10 +84,23 @@ Frage:
         vectorStore.similaritySearch(
         SearchRequest.builder()
                 .query(query)
-                .topK(1)
+                .topK(2)
                 .build()
-).forEach(doc -> System.out.println(doc.getText()));
+);
+// .forEach(doc -> System.out.println(doc.getText()));
+// String answer = chatModel.prompt().advisors(retrievalAugmentationAdvisor).user(query).call().content();
+
         return chatResponse.getResult().getOutput().getText();
     }
+
+
+//  @GetMapping("/bot")
+// public ResponseEntity<String> askBot(@RequestParam String userQuerry) {
+
+//     String response= chatBotService.getBotResponse(userQuerry);
+
+//     return ResponseEntity.ok(response);
+
+// }
 
 }
