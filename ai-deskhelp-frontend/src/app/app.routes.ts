@@ -5,6 +5,7 @@ import { LoginPageComponent } from './login-page.component';
 import { SignupPageComponent } from './features/sign-up/signup-page.component';
 import { TicketCreatePageComponent } from './features/tickets/ticket-create-page.component';
 import { SectionPageComponent } from './features/section-page/section-page.component';
+import { AiAssistantPageComponent } from './features/ai-assistant/ai-assistant-page.component';
 
 export const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
@@ -19,13 +20,9 @@ export const routes: Routes = [
       { path: 'tickets', component: TicketCreatePageComponent, data: { title: 'Create Ticket' } },
       {
         path: 'chat',
-        component: SectionPageComponent,
+        component: AiAssistantPageComponent,
         data: {
-          title: 'AI Chat',
-          eyebrow: 'Assistant workspace',
-          description: 'Use the shared AI helper shell for future chat and support interactions.',
-          actionLabel: 'Ask AI Assistant',
-          actionNote: 'Placeholder view',
+          title: 'AI Assistant',
         },
       },
       {

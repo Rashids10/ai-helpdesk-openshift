@@ -78,4 +78,34 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 
         return null;
     }
+
+/**
+ * Diese Methode bestimmt, ob der JWT Filter
+ * für einen Request übersprungen werden soll.
+ *
+ * return true  -> Filter NICHT ausführen
+ * return false -> Filter normal ausführen
+ *
+ * Dadurch können bestimmte öffentliche Endpoints
+ * ohne JWT Token erreichbar bleiben.
+ */
+@Override
+protected boolean shouldNotFilter(HttpServletRequest request) {
+
+    // Holt den aktuellen Request-Pfad
+    // Beispiel: /rag/ask
+    String path = request.getServletPath();
+
+    // Öffentliche Endpoints überspringen
+    return path.startsWith("/api/auth/")
+            || path.equals("/rag/ask")
+            || path.equals("/rag/bot")
+            || path.startsWith("/v3/api-docs/")
+            || path.startsWith("/swagger-ui/")
+            || path.equals("/swagger-ui.html")
+            || path.equals("/error");
+}
+
+
+
 }

@@ -1,0 +1,43 @@
+<section class="assistant-page">
+  <article class="panel">
+    <form class="assistant-form" [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+      <label class="field">
+        <span>Issue or request</span>
+        <textarea
+          rows="8"
+          formControlName="query"
+          placeholder="Describe your issue or request"
+          [class.invalid]="query.touched && query.invalid"
+          [attr.aria-invalid]="query.touched && query.invalid"
+        ></textarea>
+      </label>
+
+      @if (query.touched && query.hasError('required')) {
+        <p class="field-error">Describe your issue or request before asking.</p>
+      }
+      @if (query.touched && query.hasError('maxlength')) {
+        <p class="field-error">Your request must be 2000 characters or fewer.</p>
+      }
+
+      @if (errorMessage) {
+        <p class="form-error" role="alert">{{ errorMessage }}</p>
+      }
+
+      <button class="submit-button" type="submit" [disabled]="isLoading || form.invalid">
+        @if (isLoading) {
+          <span class="button-spinner" aria-hidden="true"></span>
+          <span>Asking...</span>
+        } @else {
+          Ask AI Assistant
+        }
+      </button>
+
+      @if (aiResponse) {
+        <article class="answer-panel" aria-live="polite">
+          <h2>Response</h2>
+          <p>{{ aiResponse }}</p>
+        </article>
+      }
+    </form>
+  </article>
+</section>
