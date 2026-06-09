@@ -17,6 +17,7 @@ Sie implementiert das Interface UserDetails und
 stellt alle nötigen Informationen bereit, die Spring für Login, JWT und Autorisierung benötigt.
 */
 
+
 public class UserDetailsImpl implements UserDetails {
 
     private final Long id;
@@ -41,6 +42,7 @@ public class UserDetailsImpl implements UserDetails {
     public Long getId() {
         return id;
     }
+
 
     public String getEmail() {
         return email;

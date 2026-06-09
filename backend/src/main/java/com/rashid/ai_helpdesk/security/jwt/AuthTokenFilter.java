@@ -99,6 +99,7 @@ protected boolean shouldNotFilter(HttpServletRequest request) {
     // Öffentliche Endpoints überspringen
     return path.startsWith("/api/auth/")
             || path.equals("/rag/ask")
+              || path.equals("/api/ticket/createTicket")
             || path.equals("/rag/bot")
             || path.startsWith("/v3/api-docs/")
             || path.startsWith("/swagger-ui/")

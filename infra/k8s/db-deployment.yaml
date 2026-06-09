@@ -1,0 +1,85 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+
+
+
+---
+apiVersion: apps/v1 # Deployment API
+kind: Deployment # Erstellt DB-Pod
+
+metadata:
+  name: ai-deskhelp-db # Deployment Name
+  labels:
+    app: ai-deskhelp-db # App Label
+    part: postgres # DB Label
+
+spec:
+  replicas: 1 # Nur 1 DB-Pod
+
+  selector:
+    matchLabels:
+      app: ai-deskhelp-db # Findet DB-Pod
+      part: postgres # Findet DB-Pod
+
+  template: # Pod Vorlage
+    metadata:
+      labels:
+        app: ai-deskhelp-db # Pod Label
+        part: postgres # Pod Label
+
+    spec:
+      containers:
+        - name: ai-deskhelp-db # Container Name
+          image: postgres:15 # Postgres Image
+
+          ports:
+            - containerPort: 5432 # Postgres Port
+
+          env:
+
+          - name: POSTGRES_DB
+            value: ai_deskhelp
+
+          - name: POSTGRES_USER
+            value: rashid
+
+          - name: POSTGRES_PASSWORD
+            value: my-secret-pw
+          volumeMounts:
+            - name: postgres-storage
+              mountPath: /var/lib/postgresql/data # Postgres Daten speichern#
+      volumes:
+        - name: postgres-storage
+          persistentVolumeClaim:
+            claimName: postgres-pvc # Verbindet mit PVC
+
+---
+apiVersion: v1 # Service API
+kind: Service # Netzwerkzugriff
+
+metadata:
+  name: ai-deskhelp-db-service # Service Name
+
+  labels:
+    app: ai-deskhelp-db # App Label
+    part: postgres # DB Label
+
+spec:
+  type: ClusterIP # intern erreichbar
+
+  selector:
+    app: ai-deskhelp-db # Pod Label
+    part: postgres # Pod Label
+
+  ports:
+    - port: 5432 # Service Port
+      targetPort: 5432 # Container Port
+      nodePort: 30083 # Externer Port

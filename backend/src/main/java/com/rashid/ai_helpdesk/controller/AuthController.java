@@ -51,7 +51,7 @@ public class AuthController {
         if (userDetailsService.assureEmailExists(signUpRequest.getEmail())) {
             return ResponseEntity.badRequest().body(new MessageResponse("Email is already in use."));
         }
-
+        
         userDetailsService.createUser(
                 signUpRequest.getEmail(),
                 signUpRequest.getUsername(),
@@ -104,8 +104,6 @@ return ResponseEntity.status(HttpStatus.CREATED)
                     .body(new MessageResponse("Invalid username/email or password."));
         }
     }
-
-
 
 
     @DeleteMapping("/deletemyAccount")
