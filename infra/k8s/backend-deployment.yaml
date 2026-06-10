@@ -46,9 +46,12 @@ spec:
             - name: DB_PASSWORD
               value: my-secret-pw
 
+            - name: OLLAMA_CHAT_MODEL
+              value: tinyllama
+
             - name: OLLAMA_BASE_URL
               value: http://ollama-service:11434
-              
+
 ---
 apiVersion: v1 # Service API
 kind: Service # Netzwerkzugriff

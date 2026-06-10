@@ -1,6 +1,5 @@
 apiVersion: apps/v1
 kind: Deployment
-
 metadata:
   name: frontend-ai-deskhelp-app
   labels:
@@ -8,13 +7,13 @@ metadata:
     part: angular
 
 spec:
-  replicas: 3 # Anzahl der Pods
+  replicas: 3
   selector:
     matchLabels:
       app: frontend-ai-deskhelp-app
       part: angular
 
-  template: # Pod-Vorlage
+  template:
     metadata:
       labels:
         app: frontend-ai-deskhelp-app
@@ -27,21 +26,19 @@ spec:
           imagePullPolicy: IfNotPresent
 
           ports:
-            - containerPort: 80 # Container hört auf Port 80
+            - containerPort: 80
 
           resources:
+            requests:
+              cpu: "100m"
+              memory: "64Mi"
             limits:
               cpu: "200m"
               memory: "128Mi"
 
-            requests:
-              cpu: "100m"
-              memory: "64Mi"
-
 ---
 apiVersion: v1
 kind: Service
-
 metadata:
   name: frontend-service
   labels:
@@ -49,13 +46,12 @@ metadata:
     part: angular
 
 spec:
-  type: NodePort # Von außerhalb erreichbar
+  type: ClusterIP
 
-  selector: # Verbindet Service mit Pods
+  selector:
     app: frontend-ai-deskhelp-app
     part: angular
 
   ports:
-    - port: 8081 # Service-Port
-      targetPort: 80 # Container-Port
-      nodePort: 30081 # Externer Port
+    - port: 8081
+      targetPort: 80

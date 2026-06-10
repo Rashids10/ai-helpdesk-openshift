@@ -18,7 +18,7 @@ interface SignupResponse {
   [key: string]: unknown;
 }
 
-const SIGNUP_ENDPOINT = `${environment.backendBaseUrl}/api/auth/signup`;
+const SIGNUP_ENDPOINT = `${environment.apiBaseUrl}/auth/signup`;
 const SIGNUP_REQUEST_TIMEOUT_MS = 5000;
 
 const passwordsMatchValidator: ValidatorFn = (

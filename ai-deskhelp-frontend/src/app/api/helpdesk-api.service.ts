@@ -38,8 +38,8 @@ export interface ApiResponseBody {
   [key: string]: unknown;
 }
 
-const API_BASE_URL = `${environment.backendBaseUrl}/api`;
-const RAG_ASK_ENDPOINT = `${environment.backendBaseUrl}/rag/ask`;
+const API_BASE_URL = environment.apiBaseUrl;
+const RAG_ASK_ENDPOINT = `${environment.ragBaseUrl}/ask`;
 const LOGIN_ENDPOINT = `${API_BASE_URL}/auth/login`;
 const LOGGED_IN_USERNAME_ENDPOINT = `${API_BASE_URL}/auth/logged-in-username`;
 const TICKET_CREATE_ENDPOINT = `${API_BASE_URL}/ticket/createTicket`;

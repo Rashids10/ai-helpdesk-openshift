@@ -4,18 +4,11 @@ metadata:
   name: ai-deskhelp-ingress
 
 spec:
+  ingressClassName: nginx
   rules:
     - host: ai-deskhelp.local
       http:
         paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: frontend-service
-                port:
-                  number: 8081
-
           - path: /api
             pathType: Prefix
             backend:
@@ -32,10 +25,18 @@ spec:
                 port:
                   number: 8082
 
-          - path: /swagger-ui/index.html
+          - path: /swagger-ui
             pathType: Prefix
             backend:
               service:
                 name: backend-service
                 port:
                   number: 8082
+
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: frontend-service
+                port:
+                  number: 8081

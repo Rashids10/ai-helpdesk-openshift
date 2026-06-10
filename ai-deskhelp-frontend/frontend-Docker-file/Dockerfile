@@ -15,14 +15,7 @@ RUN npm run build
 FROM nginx:alpine
 
 COPY --from=builder /myapp/dist/ai-deskhelp-frontend/browser /usr/share/nginx/html
-
+COPY ai-deskhelp-frontend/frontend-Docker-file/nginx.conf /etc/nginx/conf.d/default.conf
 EXPOSE 80
-
-
-
-
-# Step 5: Define the command to run your Spring Boot application
-
-
 
 CMD ["nginx", "-g", "daemon off;"]

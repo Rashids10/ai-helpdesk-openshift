@@ -87,8 +87,7 @@ cd backend
 
 ```
 
-##  Backend (example with FastAPI) -> please ignore  this step now
-```bash
+
 
 #still in progress ,so now please ignore  this step now
 ```

@@ -10,7 +10,6 @@ spec:
       storage: 10Gi # Speichergröße
 
 ---
-
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -48,14 +47,21 @@ spec:
           volumeMounts:
             - name: ollama-storage
               mountPath: /root/.ollama # Modelle speichern
+              resources:
+                requests:
+                  cpu: "1000m"
+                  memory: "3Gi"
+                limits:
+                  cpu: "4000m"
+                  memory: "8Gi"
 
-          resources:
-            requests:
-              cpu: "1000m" #mindest ein CPU
-              memory: "2Gi" #2GB RAM
-            limits:
-              cpu: "2000m" # maximum 2 CPU
-              memory: "3Gi" #maximimu 3 RAM
+            # resources:
+            # requests:
+            #   cpu: "1000m" #mindest ein CPU
+            #   memory: "2Gi" #2GB RAM
+            # limits:
+            #   cpu: "2000m" # maximum 2 CPU
+            #   memory: "3Gi" #maximimu 3 RAM
 
       volumes:
         - name: ollama-storage
@@ -63,7 +69,6 @@ spec:
             claimName: ollama-pvc # Nutzt PVC
 
 ---
-
 apiVersion: v1
 kind: Service
 metadata:
