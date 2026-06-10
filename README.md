@@ -5,12 +5,6 @@
 
 AI-Deskhelp is a lightweight, AI-powered IT helpdesk that answers user questions from FAQ markdown files via RAG, and escalates unclear cases to human support.
 
-## 🚀 Technologies Used
-
-<p align="center">
-  <img src="https://skillicons.dev/icons?i=angular,spring,postgres,docker,kubernetes,nginx" />
-</p>
-
 ## Features
 
 - Chat UI for users to ask IT support questions.
