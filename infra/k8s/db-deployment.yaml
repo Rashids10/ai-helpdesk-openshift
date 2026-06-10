@@ -82,4 +82,3 @@ spec:
   ports:
     - port: 5432 # Service Port
       targetPort: 5432 # Container Port
-      nodePort: 30083 # Externer Port

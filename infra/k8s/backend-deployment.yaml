@@ -61,7 +61,7 @@ metadata:
     part: java-spring # Backend Label
 
 spec:
-  type: NodePort # Extern erreichbar
+  type: ClusterIP # intern erreichbar
 
   selector:
     app: backend-ai-deskhelp-app # Verbindet Pods
@@ -71,5 +71,3 @@ spec:
     - port: 8082 # Service Port
 
       targetPort: 8089 # Weiterleitung zum Container
-
-      nodePort: 30082 # Externer Port
