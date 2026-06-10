@@ -57,12 +57,14 @@ NGINX Ingress
 
 
 
-## How It Works (happy path and fallback)
-1. User asks a question in the Chat UI.
-2. Backend API stores the message and calls the RAG module.
-3. RAG retrieves top FAQ chunks from the vector store.
-4. LLM generates an answer using the retrieved context and returns confidence.
-5. If confident: API sends the AI reply to the user and logs it.
+## How It Works
+
+1. User submits a question through the AI-Deskhelp interface.
+2. The Spring Boot backend receives the request.
+3. The RAG system searches the vector store for relevant knowledge-base entries.
+4. Ollama generates a response using the retrieved context.
+5. The generated answer is returned to the user.
+6. If no relevant information is found, the user is informed that the issue should be escalated to IT Support.
 
 
 ## Setup
