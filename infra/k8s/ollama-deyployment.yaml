@@ -1,25 +1,35 @@
+# Persistent Volume Claim
+# Speichert die heruntergeladenen Ollama-Modelle dauerhaft,
+# damit sie nach einem Pod-Neustart nicht verloren gehen.
 apiVersion: v1
 kind: PersistentVolumeClaim
+
 metadata:
-  name: ollama-pvc # Speicher für Modelle
+  name: ollama-pvc
+
 spec:
   accessModes:
-    - ReadWriteOnce # Ein Pod nutzt Volume
+    - ReadWriteOnce # Das Volume darf von einem Pod gleichzeitig genutzt werden
+
   resources:
     requests:
-      storage: 10Gi # Speichergröße
+      storage: 10Gi # Reserviere 10 GB Speicherplatz
 
 ---
+
+# Deployment erstellt und verwaltet den Ollama-Pod
 apiVersion: apps/v1
 kind: Deployment
+
 metadata:
-  name: ollama-ai-deskhelp # Deployment Name
+  name: ollama-ai-deskhelp
+
   labels:
     app: ollama-ai-deskhelp
     part: ollama
 
 spec:
-  replicas: 1 # Nur ein Ollama Pod
+  replicas: 1 # Ein Ollama-Pod reicht aus
 
   selector:
     matchLabels:
@@ -27,58 +37,72 @@ spec:
       part: ollama
 
   template:
+
     metadata:
       labels:
         app: ollama-ai-deskhelp
         part: ollama
 
     spec:
+
       containers:
-        - name: ollama-ai-deskhelp # Container Name
-          image: ollama/ollama:latest # Ollama Image
+        - name: ollama-ai-deskhelp
+
+          # Offizielles Ollama Docker Image
+          image: ollama/ollama:latest
 
           ports:
-            - containerPort: 11434 # Ollama Port
+            # Ollama API läuft auf Port 11434
+            - containerPort: 11434
 
           env:
+            # GPU deaktivieren
+            # Da Minikube meistens nur CPU nutzt
             - name: CUDA_VISIBLE_DEVICES
-              value: "-1" # Keine GPU nutzen
+              value: "-1"
 
           volumeMounts:
+            # Modelle werden hier gespeichert
+            # z.B. phi3, llama3, mxbai-embed-large
             - name: ollama-storage
-              mountPath: /root/.ollama # Modelle speichern
-              resources:
-                requests:
-                  cpu: "1000m"
-                  memory: "3Gi"
-                limits:
-                  cpu: "4000m"
-                  memory: "8Gi"
+              mountPath: /root/.ollama
 
-            # resources:
-            # requests:
-            #   cpu: "1000m" #mindest ein CPU
-            #   memory: "2Gi" #2GB RAM
-            # limits:
-            #   cpu: "2000m" # maximum 2 CPU
-            #   memory: "3Gi" #maximimu 3 RAM
+          resources:
+
+            # Mindestressourcen die Kubernetes reservieren soll
+            requests:
+              cpu: "1000m"     # 1 CPU-Core
+              memory: "3Gi"    # 3 GB RAM
+
+            # Maximale Ressourcen die Ollama nutzen darf
+            limits:
+              cpu: "4000m"     # Bis zu 4 CPU-Cores
+              memory: "8Gi"    # Bis zu 8 GB RAM
 
       volumes:
         - name: ollama-storage
+
+          # Verknüpfung zum PVC
           persistentVolumeClaim:
-            claimName: ollama-pvc # Nutzt PVC
+            claimName: ollama-pvc
 
 ---
+
+# Service macht Ollama innerhalb des Clusters erreichbar
 apiVersion: v1
 kind: Service
+
 metadata:
-  name: ollama-service # Service Name
+  name: ollama-service
+
   labels:
     app: ollama-ai-deskhelp
     part: ollama
 
 spec:
-  type: ClusterIP # Nur intern im Cluster
+
+  # Nur innerhalb des Kubernetes-Clusters erreichbar
+  type: ClusterIP
 
   selector:
     app: ollama-ai-deskhelp
@@ -86,5 +110,9 @@ spec:
 
   ports:
     - name: http
-      port: 11434 # Service Port
-      targetPort: 11434 # Container Port
+
+      # Port über den andere Pods Ollama ansprechen
+      port: 11434
+
+      # Weiterleitung zum Container-Port
+      targetPort: 11434

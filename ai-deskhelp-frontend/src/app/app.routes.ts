@@ -6,14 +6,16 @@ import { SignupPageComponent } from './features/sign-up/signup-page.component';
 import { TicketCreatePageComponent } from './features/tickets/ticket-create-page.component';
 import { SectionPageComponent } from './features/section-page/section-page.component';
 import { AiAssistantPageComponent } from './features/ai-assistant/ai-assistant-page.component';
+import { authGuard } from './core/auth/auth.guard';
 
 export const routes: Routes = [
-  { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
+  { path: '', pathMatch: 'full', redirectTo: 'login' },
   { path: 'signup', component: SignupPageComponent },
   { path: 'login', component: LoginPageComponent },
   {
     path: '',
     component: AppLayoutComponent,
+    canActivate: [authGuard],
     children: [
       { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
       { path: 'dashboard', component: DashboardPageComponent, data: { title: 'Dashboard overview' } },
@@ -38,5 +40,5 @@ export const routes: Routes = [
       },
     ],
   },
-  { path: '**', redirectTo: 'signup' }
+  { path: '**', redirectTo: 'login' },
 ];

@@ -45,7 +45,7 @@ const LOGGED_IN_USERNAME_ENDPOINT = `${API_BASE_URL}/auth/logged-in-username`;
 const TICKET_CREATE_ENDPOINT = `${API_BASE_URL}/ticket/createTicket`;
 const MY_TICKETS_ENDPOINT = `${API_BASE_URL}/ticket/my-tickets`;
 const REQUEST_TIMEOUT_MS = 5000;
-const RAG_REQUEST_TIMEOUT_MS = 30000;
+const RAG_REQUEST_TIMEOUT_MS = 240000;
 
 @Injectable({
   providedIn: 'root',

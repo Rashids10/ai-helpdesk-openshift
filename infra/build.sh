@@ -16,5 +16,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)" #Dirname : dirname = 
 
 kubectl apply -f "$SCRIPT_DIR/k8s/db-deployment.yaml" # was ausgeführt wird /Users/abdirashid.farah/work/ai-helpdesk/infra/k8s/db-deployment.yaml
 kubectl apply -f "$SCRIPT_DIR/k8s/frontend-deployment.yaml"
+kubectl apply -f "$SCRIPT_DIR/k8s/ollama-deyployment.yaml"
 kubectl apply -f "$SCRIPT_DIR/k8s/backend-deployment.yaml"
 kubectl apply -f "$SCRIPT_DIR/k8s/web-ingress.yaml"
+
