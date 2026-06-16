@@ -1,15 +1,15 @@
 # AI-Deskhelp
 
-[![Project Status](https://img.shields.io/badge/status-MVP-blue)](#) [![Tech Stack](https://img.shields.io/badge/stack-TS%20%7C%20React%20%7C%20FastAPI%20%7C%20Postgres%20%7C%20FAISS%20%7C%20LLM-lightgrey)](#)
+[![Project Status](https://img.shields.io/badge/status-MVP-blue)](#)
+[![Tech Stack](https://img.shields.io/badge/stack-Angular%20%7C%20SpringBoot%20%7C%20PostgreSQL%20%7C%20Docker%20%7C%20Kubernetes%20%7C%20Ollama-lightgrey)](#)
 
 AI-Deskhelp is a lightweight, AI-powered IT helpdesk that answers user questions from FAQ markdown files via RAG, and escalates unclear cases to human support.
 
 ## Features
+
 - Chat UI for users to ask IT support questions.
 - Retrieval-Augmented Generation over FAQ markdown files.
-- LLM answers with cited context; falls back to human support on low confidence.
-- Ticket creation and tracking for escalations.
-- Persistent storage of chats, tickets, and retrieval metadata.
+...
 
 ## Why this project?
 - Practice a practical AI product: combines RAG + LLM + human-in-the-loop.
@@ -19,21 +19,53 @@ AI-Deskhelp is a lightweight, AI-powered IT helpdesk that answers user questions
 ## Architecture Overview
 See `docs/architecture.md` for the Mermaid diagram and detailed component notes. The design uses a modular monolith backend to keep the MVP simple and buildable.
 
-## Tech Stack ( MVP)
-- Frontend: React + TypeScript (Vite)
-- Backend: FastAPI (Python) or Express.js (Node) — pick one for the monolith
-- Database: PostgreSQL (SQLite acceptable for local dev)
-- Vector Store: FAISS (local) or SQLite-based embeddings index
-- LLM: Hosted API (e.g., OpenAI GPT-4/5) with retrieval context
+## 🚀 Tech Stack
 
-## How It Works (happy path and fallback)
-1. User asks a question in the Chat UI.
-2. Backend API stores the message and calls the RAG module.
-3. RAG retrieves top FAQ chunks from the vector store.
-4. LLM generates an answer using the retrieved context and returns confidence.
-5. If confident: API sends the AI reply to the user and logs it.
-6. If low confidence/no context: API creates a ticket, notifies Human Support, and returns an escalated status to the user.
-7. Human Support replies via the console; the response is delivered back to the user through the same chat.
+| Layer            | Technology                                |
+| ---------------- | ----------------------------------------- |
+| Frontend         | Angular 20, TypeScript                    |
+| Backend          | Spring Boot 3, Spring Security, Spring AI |
+| Database         | PostgreSQL                                |
+| AI / RAG         | Ollama, Spring AI, Vector Store           |
+| Containerization | Docker, Docker Compose                    |
+| Orchestration    | Kubernetes (Minikube)                     |
+| Networking       | NGINX, NGINX Ingress Controller           |
+| CI/CD            | GitHub Actions *(planned)*                |
+
+### Technologies Used
+
+<p align="center">
+  <img src="https://skillicons.dev/icons?i=angular,spring,postgres,docker,kubernetes,githubactions" />
+</p>
+
+### Architecture
+
+```text
+Browser
+   │
+   ▼
+NGINX Ingress
+   │
+   ├── Angular Frontend
+   │
+   └── Spring Boot Backend
+            │
+            ├── PostgreSQL
+            │
+            └── Ollama (LLM)
+```
+
+
+
+## How It Works
+
+1. User submits a question through the AI-Deskhelp interface.
+2. The Spring Boot backend receives the request.
+3. The RAG system searches the vector store for relevant knowledge-base entries.
+4. Ollama generates a response using the retrieved context.
+5. The generated answer is returned to the user.
+6. If no relevant information is found, the user is informed that the issue should be escalated to IT Support.
+
 
 ## Setup
 
@@ -55,8 +87,7 @@ cd backend
 
 ```
 
-##  Backend (example with FastAPI) -> please ignore  this step now
-```bash
+
 
 #still in progress ,so now please ignore  this step now
 ```

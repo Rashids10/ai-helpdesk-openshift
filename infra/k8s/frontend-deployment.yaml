@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend-ai-deskhelp-app
+  labels:
+    app: frontend-ai-deskhelp-app
+    part: angular
+
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: frontend-ai-deskhelp-app
+      part: angular
+
+  template:
+    metadata:
+      labels:
+        app: frontend-ai-deskhelp-app
+        part: angular
+
+    spec:
+      containers:
+        - name: frontend-ai-deskhelp
+          image: frontend-ai-deskhelp:latest
+          imagePullPolicy: IfNotPresent
+
+          ports:
+            - containerPort: 80
+
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "64Mi"
+            limits:
+              cpu: "200m"
+              memory: "128Mi"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-service
+  labels:
+    app: frontend-ai-deskhelp-app
+    part: angular
+
+spec:
+  type: ClusterIP
+
+  selector:
+    app: frontend-ai-deskhelp-app
+    part: angular
+
+  ports:
+    - port: 8081
+      targetPort: 80

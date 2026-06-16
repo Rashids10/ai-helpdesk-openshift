@@ -44,6 +44,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         user.setUsername(username);
         user.setPassword(passwordEncoder.encode(password));
         userRepository.save(user);
+
+    
     }
 
     public UserEntity findUserById(Long userId) {

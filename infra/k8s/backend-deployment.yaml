@@ -1,0 +1,89 @@
+apiVersion: apps/v1 # Deployment API
+kind: Deployment # Erstellt Pods
+
+metadata:
+  name: backend-spring-app # Deployment Name
+  labels:
+    app: backend-ai-deskhelp-app # App Label
+    part: java-spring # Backend Label
+
+spec:
+  replicas: 1 # Für Minikube reicht 1 Pod, spart RAM
+
+  selector:
+    matchLabels:
+      app: backend-ai-deskhelp-app # Findet Pods
+      part: java-spring # Mit diesem Label
+
+  template: # Pod Vorlage
+    metadata:
+      labels:
+        app: backend-ai-deskhelp-app # Pod Label
+        part: java-spring # Pod Label
+
+    spec:
+      containers:
+        - name: backend-ai-deskhelp # Container Name
+
+          image: backend-ai-deskhelp:latest # Docker Image
+
+          imagePullPolicy: IfNotPresent # Nur laden falls nötig
+
+          ports:
+            - containerPort: 8089 # Spring Boot Port
+
+          env:
+            - name: DB_HOST
+              value: ai-deskhelp-db-service # PostgreSQL Service Name
+
+            - name: DB_PORT
+              value: "5432" # PostgreSQL Port
+
+            - name: DB_NAME
+              value: ai_deskhelp # Datenbankname
+
+            - name: POSTGRES_USER
+              value: rashid # DB User
+
+            - name: DB_PASSWORD
+              value: my-secret-pw # DB Passwort
+
+            - name: OLLAMA_CHAT_MODEL
+              value: phi3:mini # Kleines Modell, besser für Minikube
+
+            - name: OLLAMA_BASE_URL
+              value: http://ollama-service:11434 # Ollama Service im Cluster
+
+            - name: JAVA_TOOL_OPTIONS
+              value: "-Xmx512m" # Begrenzung für Java Heap auf 512 MB
+
+          resources:
+            requests:
+              cpu: "500m" # Reserviert mindestens 0.5 CPU
+              memory: "768Mi" # Reserviert mindestens 768 MB RAM
+
+            limits:
+              cpu: "1500m" # Maximal 1.5 CPU
+              memory: "1Gi" # Maximal 1 GB RAM
+
+---
+apiVersion: v1 # Service API
+kind: Service # Netzwerkzugriff
+
+metadata:
+  name: backend-service # Service Name
+
+  labels:
+    app: backend-ai-deskhelp-app # App Label
+    part: java-spring # Backend Label
+
+spec:
+  type: ClusterIP # intern erreichbar
+
+  selector:
+    app: backend-ai-deskhelp-app # Verbindet Service mit Backend Pods
+    part: java-spring # Mit diesen Labels
+
+  ports:
+    - port: 8082 # Service Port
+      targetPort: 8089 # Weiterleitung zum Container-Port

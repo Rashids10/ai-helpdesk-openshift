@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Subject, timeout } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 export interface LoginRequest {
   userEmail: string;
@@ -37,14 +38,14 @@ export interface ApiResponseBody {
   [key: string]: unknown;
 }
 
-const API_BASE_URL = 'http://localhost:8089/api';
-const RAG_ASK_ENDPOINT = 'http://localhost:8089/rag/ask';
+const API_BASE_URL = environment.apiBaseUrl;
+const RAG_ASK_ENDPOINT = `${environment.ragBaseUrl}/ask`;
 const LOGIN_ENDPOINT = `${API_BASE_URL}/auth/login`;
 const LOGGED_IN_USERNAME_ENDPOINT = `${API_BASE_URL}/auth/logged-in-username`;
 const TICKET_CREATE_ENDPOINT = `${API_BASE_URL}/ticket/createTicket`;
 const MY_TICKETS_ENDPOINT = `${API_BASE_URL}/ticket/my-tickets`;
 const REQUEST_TIMEOUT_MS = 5000;
-const RAG_REQUEST_TIMEOUT_MS = 30000;
+const RAG_REQUEST_TIMEOUT_MS = 240000;
 
 @Injectable({
   providedIn: 'root',

@@ -1,6 +1,25 @@
 version: '3.8'
 
 services:
+  frontend:
+    image: frontend-ai-deskhelp:latest  
+    ports:
+      - "4200:80"
+
+  backend:
+    image: backend-ai-deskhelp:latest
+    ports:
+      - "8089:8089"
+
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: ai_deskhelp
+      DB_USER: rashid
+      DB_PASSWORD: my-secret-pw
+
+    depends_on:
+      - db
   db:
     image: postgres:15
     container_name: ai-deskhelp-db
@@ -13,7 +32,6 @@ services:
       - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-
   pgadmin:
     image: dpage/pgadmin4
     container_name: ai-deskhelp-pgadmin
@@ -25,6 +43,8 @@ services:
       
     ports:
       - "8088:80"
+
+
 
 volumes:
   postgres_data:

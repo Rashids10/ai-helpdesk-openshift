@@ -1,5 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { clearStoredAuthTokens } from '../../auth/auth-storage';
 
 interface NavigationItem {
   label: string;
@@ -24,7 +25,7 @@ export class SidebarComponent {
   ];
 
   protected logout(): void {
-    localStorage.removeItem('accessToken');
+    clearStoredAuthTokens();
     void this.router.navigate(['/login'], { replaceUrl: true });
   }
 }

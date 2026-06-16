@@ -1,0 +1,118 @@
+# Persistent Volume Claim
+# Speichert die heruntergeladenen Ollama-Modelle dauerhaft,
+# damit sie nach einem Pod-Neustart nicht verloren gehen.
+apiVersion: v1
+kind: PersistentVolumeClaim
+
+metadata:
+  name: ollama-pvc
+
+spec:
+  accessModes:
+    - ReadWriteOnce # Das Volume darf von einem Pod gleichzeitig genutzt werden
+
+  resources:
+    requests:
+      storage: 10Gi # Reserviere 10 GB Speicherplatz
+
+---
+
+# Deployment erstellt und verwaltet den Ollama-Pod
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: ollama-ai-deskhelp
+
+  labels:
+    app: ollama-ai-deskhelp
+    part: ollama
+
+spec:
+  replicas: 1 # Ein Ollama-Pod reicht aus
+
+  selector:
+    matchLabels:
+      app: ollama-ai-deskhelp
+      part: ollama
+
+  template:
+
+    metadata:
+      labels:
+        app: ollama-ai-deskhelp
+        part: ollama
+
+    spec:
+
+      containers:
+        - name: ollama-ai-deskhelp
+
+          # Offizielles Ollama Docker Image
+          image: ollama/ollama:latest
+
+          ports:
+            # Ollama API läuft auf Port 11434
+            - containerPort: 11434
+
+          env:
+            # GPU deaktivieren
+            # Da Minikube meistens nur CPU nutzt
+            - name: CUDA_VISIBLE_DEVICES
+              value: "-1"
+
+          volumeMounts:
+            # Modelle werden hier gespeichert
+            # z.B. phi3, llama3, mxbai-embed-large
+            - name: ollama-storage
+              mountPath: /root/.ollama
+
+          resources:
+
+            # Mindestressourcen die Kubernetes reservieren soll
+            requests:
+              cpu: "1000m"     # 1 CPU-Core
+              memory: "3Gi"    # 3 GB RAM
+
+            # Maximale Ressourcen die Ollama nutzen darf
+            limits:
+              cpu: "4000m"     # Bis zu 4 CPU-Cores
+              memory: "8Gi"    # Bis zu 8 GB RAM
+
+      volumes:
+        - name: ollama-storage
+
+          # Verknüpfung zum PVC
+          persistentVolumeClaim:
+            claimName: ollama-pvc
+
+---
+
+# Service macht Ollama innerhalb des Clusters erreichbar
+apiVersion: v1
+kind: Service
+
+metadata:
+  name: ollama-service
+
+  labels:
+    app: ollama-ai-deskhelp
+    part: ollama
+
+spec:
+
+  # Nur innerhalb des Kubernetes-Clusters erreichbar
+  type: ClusterIP
+
+  selector:
+    app: ollama-ai-deskhelp
+    part: ollama
+
+  ports:
+    - name: http
+
+      # Port über den andere Pods Ollama ansprechen
+      port: 11434
+
+      # Weiterleitung zum Container-Port
+      targetPort: 11434

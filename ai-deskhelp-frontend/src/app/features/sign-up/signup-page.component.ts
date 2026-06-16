@@ -8,6 +8,7 @@ import {
   Validators,
 } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { environment } from '../../../environments/environment';
 
 interface SignupResponse {
   accessToken?: string;
@@ -17,7 +18,7 @@ interface SignupResponse {
   [key: string]: unknown;
 }
 
-const SIGNUP_ENDPOINT = 'http://localhost:8089/api/auth/signup';
+const SIGNUP_ENDPOINT = `${environment.apiBaseUrl}/auth/signup`;
 const SIGNUP_REQUEST_TIMEOUT_MS = 5000;
 
 const passwordsMatchValidator: ValidatorFn = (
