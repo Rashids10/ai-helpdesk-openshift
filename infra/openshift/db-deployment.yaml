@@ -1,0 +1,95 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-pvc # PVC für persistente PostgreSQL-Daten
+spec:
+  accessModes:
+    - ReadWriteOnce # Volume kann von einem Node gelesen/geschrieben werden
+  resources:
+    requests:
+      storage: 1Gi # Speichergröße für PostgreSQL
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ai-deskhelp-db # Deployment Name
+  labels:
+    app: ai-deskhelp-db
+    part: postgres
+
+spec:
+  replicas: 1 # PostgreSQL nur mit 1 Pod betreiben
+
+  selector:
+    matchLabels:
+      app: ai-deskhelp-db
+      part: postgres
+
+  template:
+    metadata:
+      labels:
+        app: ai-deskhelp-db
+        part: postgres
+
+    spec:
+      containers:
+        - name: ai-deskhelp-db
+          image: registry.redhat.io/rhel8/postgresql-15 # OpenShift-kompatibles PostgreSQL Image
+
+          ports:
+            - containerPort: 5432 # PostgreSQL Port im Container
+
+          env:
+            - name: POSTGRESQL_DATABASE # DB-Name für Red-Hat-Postgres
+              value: ai_deskhelp
+
+            - name: POSTGRESQL_USER # DB-User für Red-Hat-Postgres
+              value: rashid
+
+            - name: POSTGRESQL_PASSWORD # DB-Passwort aus Secret
+              valueFrom:
+                secretKeyRef:
+                  name: my-secret-pw
+                  key: DB_PASSWORD
+
+          volumeMounts:
+            - name: postgres-storage
+              mountPath: /var/lib/pgsql/data # Datenpfad für Red-Hat-Postgres
+
+          livenessProbe:
+            tcpSocket:
+              port: 5432
+            initialDelaySeconds: 30
+            periodSeconds: 10
+
+          readinessProbe:
+            tcpSocket:
+              port: 5432
+            initialDelaySeconds: 15
+            periodSeconds: 5
+
+      volumes:
+        - name: postgres-storage
+          persistentVolumeClaim:
+            claimName: postgres-pvc # Verbindet Pod mit PVC
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ai-deskhelp-db-service # Interner Service für Backend
+  labels:
+    app: ai-deskhelp-db
+    part: postgres
+
+spec:
+  type: ClusterIP # Nur innerhalb des Clusters erreichbar
+
+  selector:
+    app: ai-deskhelp-db
+    part: postgres
+
+  ports:
+    - port: 5432 # Service-Port
+      targetPort: 5432 # Container-Port

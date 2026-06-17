@@ -7,7 +7,6 @@ import java.util.List;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.reader.TextReader;
 import org.springframework.ai.vectorstore.VectorStore;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 
@@ -16,11 +15,15 @@ import jakarta.annotation.PostConstruct;
 @Component
 public class DataInitializer {
 
- @Autowired 
-  private  VectorStore vectorStore;
+
+  private final VectorStore vectorStore;
+
+  public DataInitializer(VectorStore vectorStore) {
+    this.vectorStore = vectorStore;
+  }
 
 
-  @PostConstruct
+    @PostConstruct
     public void initData(){
 
         TextReader textReader = new TextReader(new ClassPathResource("/docs/rag-knowledge-base.md"));
@@ -37,14 +40,13 @@ public class DataInitializer {
         // // List<Document> documents = splitter.split(textReader.get());      
     
 
-     String content = textReader.get().getFirst().getText();
+        String content = textReader.get().getFirst().getText();
+        List<Document> documents = Arrays.stream(content.split("(?m)^---\\s*$"))
+            .map(String::trim)
+            .filter(section -> !section.isBlank())
+            .map(Document::new)
+            .toList();
 
-String[] faqChunks = content.split("---");
-
-List<Document> documents = Arrays.stream(faqChunks)
-    .map(Document::new)
-    .toList();
-
-vectorStore.add(documents);
+        vectorStore.add(documents);
     }    
 }

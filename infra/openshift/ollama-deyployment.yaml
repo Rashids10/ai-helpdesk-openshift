@@ -37,47 +37,71 @@ spec:
       part: ollama
 
   template:
-
     metadata:
       labels:
         app: ollama-ai-deskhelp
         part: ollama
 
     spec:
-
       containers:
         - name: ollama-ai-deskhelp
 
           # Offizielles Ollama Docker Image
           image: ollama/ollama:latest
 
+          startupProbe:
+            httpGet:
+              path: /api/tags
+              port: 11434
+            initialDelaySeconds: 10 # Nach Start 10 Sekunden warten
+            periodSeconds: 10 # Alle 10 Sekunden prüfen
+            failureThreshold: 30 # Maximal 30 Fehlversuche
+            timeoutSeconds: 5
+
+          livenessProbe: # Anwendung lebt noch?
+            httpGet:
+              path: /api/tags
+              port: 11434
+            periodSeconds: 10 # Alle 10 Sekunden prüfen
+            failureThreshold: 3 # Nach 3 Fehlern Neustart
+            timeoutSeconds: 5
+
+          readinessProbe: # Anwendung bereit für Traffic?
+            httpGet:
+              path: /api/tags
+              port: 11434
+            periodSeconds: 5 # Alle 5 Sekunden prüfen
+            failureThreshold: 3 # Nach 3 Fehlern nicht bereit
+            timeoutSeconds: 5
+
           ports:
             # Ollama API läuft auf Port 11434
             - containerPort: 11434
-
-          env:
-            # GPU deaktivieren
-            # Da Minikube meistens nur CPU nutzt
-            - name: CUDA_VISIBLE_DEVICES
-              value: "-1"
 
           volumeMounts:
             # Modelle werden hier gespeichert
             # z.B. phi3, llama3, mxbai-embed-large
             - name: ollama-storage
-              mountPath: /root/.ollama
+              mountPath: /tmp/ollama
+
+          env:
+            - name: HOME
+              value: /tmp
+            - name: OLLAMA_MODELS
+              value: /tmp/ollama/models
+            - name: OLLAMA_HOST
+              value: 0.0.0.0:11434
 
           resources:
-
             # Mindestressourcen die Kubernetes reservieren soll
             requests:
-              cpu: "1000m"     # 1 CPU-Core
-              memory: "3Gi"    # 3 GB RAM
+              cpu: "4000m" # 4 CPU-Cores
+              memory: "4Gi" # 2 GB RAM
 
             # Maximale Ressourcen die Ollama nutzen darf
             limits:
-              cpu: "4000m"     # Bis zu 4 CPU-Cores
-              memory: "8Gi"    # Bis zu 8 GB RAM
+              cpu: "4000m" # Bis zu 4 CPU-Cores
+              memory: "8Gi" # Bis zu 8 GB RAM
 
       volumes:
         - name: ollama-storage
@@ -100,7 +124,6 @@ metadata:
     part: ollama
 
 spec:
-
   # Nur innerhalb des Kubernetes-Clusters erreichbar
   type: ClusterIP
 

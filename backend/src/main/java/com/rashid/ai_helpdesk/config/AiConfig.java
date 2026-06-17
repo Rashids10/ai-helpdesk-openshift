@@ -46,7 +46,7 @@ public class AiConfig {
         return QuestionAnswerAdvisor.builder(vectorStore)
                 .searchRequest(SearchRequest.builder()
                         .topK(2)
-                        .similarityThreshold(0.7)
+                        .similarityThreshold(0.3)
                         .build())
                 .promptTemplate(RAG_USER_PROMPT)
                 .build();
@@ -60,7 +60,7 @@ public class AiConfig {
                 .defaultSystem(RAG_SYSTEM_PROMPT)
                 .defaultOptions(OllamaOptions.builder()
                         .temperature(0.0)
-                        .numPredict(256)
+                        .numPredict(24)
                         .build())
                 .defaultAdvisors(questionAnswerAdvisor)
                 .build();

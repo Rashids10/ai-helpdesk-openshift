@@ -1,0 +1,117 @@
+apiVersion: apps/v1 # Deployment API
+kind: Deployment # Erstellt und verwaltet Pods
+
+metadata:
+  name: backend-spring-app # Deployment Name
+
+  labels:
+    app: backend-ai-deskhelp-app # App Label
+    part: java-spring # Backend Kennzeichnung
+
+spec:
+  replicas: 1 # Anzahl der Pods
+
+  selector:
+    matchLabels:
+      app: backend-ai-deskhelp-app # Findet passende Pods
+      part: java-spring # Mit diesem Label
+
+  template: # Vorlage für neue Pods
+
+    metadata:
+      labels:
+        app: backend-ai-deskhelp-app # Pod Label
+        part: java-spring # Pod Label
+
+    spec:
+      # imagePullSecrets:
+      #  - name: ghcr-secret
+
+      containers:
+        - name: backend-ai-deskhelp # Container Name
+
+          image: ghcr.io/rashids10/backend-ai-deskhelp:v3 # Docker Image
+
+          ports:
+            - containerPort: 8089 # Spring Boot Port
+
+          livenessProbe: # Anwendung lebt noch?
+            tcpSocket:
+              port: 8089 # Backend Port
+            initialDelaySeconds: 30 # Nach Start 30 Sekunden warten
+            periodSeconds: 10 # Alle 10 Sekunden prüfen
+
+          readinessProbe: # Anwendung bereit für Traffic?
+            tcpSocket:
+              port: 8089 # Backend Port
+            initialDelaySeconds: 15 # Nach Start 15 Sekunden warten
+            periodSeconds: 5 # Alle 5 Sekunden prüfen
+
+          startupProbe: # Anwendung darf langsam starten
+            tcpSocket:
+              port: 8089 # Backend Port
+            periodSeconds: 10
+            failureThreshold: 60
+
+          env:
+            
+              - name: DB_HOST
+                value: ai-deskhelp-db-service
+              - name: DB_PORT
+                value: "5432"
+              - name: DB_NAME
+                value: ai_deskhelp
+              - name: POSTGRES_USER
+                value: rashid
+              - name: DB_PASSWORD
+                valueFrom:
+                  secretKeyRef:
+                    name: my-secret-pw
+                    key: DB_PASSWORD
+
+              - name: SPRING_FLYWAY_BASELINE_ON_MIGRATE
+                value: "true" # Bestehende DB ohne flyway_schema_history sicher baselinen
+
+              - name: OLLAMA_CHAT_MODEL
+                value: qwen2.5:0.5b # Kleines CPU-freundliches Chat-Modell
+
+              - name: OLLAMA_BASE_URL
+                value: http://ollama-service:11434 # Ollama Service URL
+
+              - name: OLLAMA_EMBEDDING_MODEL
+                value: nomic-embed-text # Kleines CPU-freundliches Embedding-Modell
+
+              - name: JAVA_TOOL_OPTIONS
+                value: "-Xmx512m" # Java Heap Limit
+
+          resources:
+            requests:
+              cpu: "500m" # Reserviert 0.5 CPU
+              memory: "768Mi" # Reserviert 768 MB RAM
+
+            limits:
+              cpu: "1500m" # Maximal 1.5 CPU
+              memory: "1Gi" # Maximal 1 GB RAM
+
+---
+apiVersion: v1 # Service API
+kind: Service # Netzwerkzugriff für Pods
+
+metadata:
+  name: backend-service # Service Name
+
+  labels:
+    app: backend-ai-deskhelp-app # App Label
+    part: java-spring # Backend Kennzeichnung
+
+spec:
+  type: ClusterIP # Nur intern erreichbar
+
+  selector:
+    app: backend-ai-deskhelp-app # Verbindet Service mit Pods
+    part: java-spring # Passende Labels
+
+  ports:
+    - name: http
+      port: 8082 # Service Port
+      targetPort: 8089 # Weiterleitung an Spring Boot
