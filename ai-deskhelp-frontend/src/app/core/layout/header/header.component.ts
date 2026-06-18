@@ -1,5 +1,5 @@
-import { Component, Input, OnInit, inject } from '@angular/core';
-import { HelpdeskApiService } from '../../../api/helpdesk-api.service';
+import { Component, Input, computed, inject } from '@angular/core';
+import { AuthService } from '../../auth/auth.service';
 
 @Component({
   selector: 'app-header',
@@ -7,22 +7,17 @@ import { HelpdeskApiService } from '../../../api/helpdesk-api.service';
   templateUrl: './header.component.html',
   styleUrl: './header.component.css',
 })
-export class HeaderComponent implements OnInit {
-  private readonly api = inject(HelpdeskApiService);
+export class HeaderComponent {
+  private readonly auth = inject(AuthService);
 
   @Input() title = 'Dashboard overview';
-  protected username = 'Signed in';
-  protected userRole = 'Support Agent';
-  protected isLoadingUsername = true;
+  protected readonly username = this.auth.username;
+  protected readonly isLoadingUsername = this.auth.isLoadingUsername;
+  protected readonly userRole = this.auth.signedInLabel;
+  protected readonly avatarInitials = computed(() => {
+    const value = this.username().trim();
 
-  ngOnInit(): void {
-    void this.loadUsername();
-  }
-
-  protected get avatarInitials(): string {
-    const value = this.username.trim();
-
-    if (!value || value === 'Signed in') {
+    if (!value || value === 'User') {
       return 'AD';
     }
 
@@ -30,21 +25,5 @@ export class HeaderComponent implements OnInit {
     const initials = parts.slice(0, 2).map((part) => part[0]?.toUpperCase() ?? '');
 
     return initials.join('').slice(0, 2) || 'AD';
-  }
-
-  private async loadUsername(): Promise<void> {
-    this.isLoadingUsername = true;
-
-    try {
-      const username = await this.api.getLoggedInUsername();
-
-      if (username) {
-        this.username = username;
-      }
-    } catch {
-      this.username = 'Signed in';
-    } finally {
-      this.isLoadingUsername = false;
-    }
-  }
+  });
 }

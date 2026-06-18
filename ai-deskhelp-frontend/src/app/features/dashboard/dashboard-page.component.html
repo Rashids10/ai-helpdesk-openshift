@@ -2,18 +2,18 @@
   <header class="hero card">
     <div>
       <p class="eyebrow">Dashboard overview</p>
-      <h1>Welcome back</h1>
+      <h1>{{ welcomeLabel() }}</h1>
       <p class="subtitle">Track your support tickets and get AI-assisted help.</p>
     </div>
-    <div class="hero-badge">Signed in</div>
+    <div class="hero-badge">{{ signedInLabel() }}</div>
   </header>
 
-  @if (isLoading) {
+  @if (isLoading()) {
     <p class="list-state dashboard-state">Loading tickets...</p>
   }
 
   <section class="stats-grid" aria-label="Ticket summary">
-    @for (card of statCards; track card.label) {
+    @for (card of statCards(); track card.label) {
       <article class="stat card">
         <p class="stat-label">{{ card.label }}</p>
         <div class="stat-value">{{ card.value }}</div>
@@ -31,11 +31,11 @@
         </div>
       </div>
 
-      @if (errorMessage) {
-        <p class="list-error" role="alert">{{ errorMessage }}</p>
+      @if (errorMessage()) {
+        <p class="list-error" role="alert">{{ errorMessage() }}</p>
       }
 
-      @if (isLoading) {
+      @if (isLoading()) {
         <p class="list-state">Loading tickets...</p>
       } @else {
         <div class="table-wrap">
@@ -48,12 +48,12 @@
               </tr>
             </thead>
             <tbody>
-              @if (!hasTickets) {
+              @if (!hasTickets()) {
                 <tr>
                   <td colspan="3" class="empty-state">No tickets yet</td>
                 </tr>
               } @else {
-                @for (ticket of tickets; track ticket.id) {
+                @for (ticket of tickets(); track ticket.id) {
                   <tr>
                     <td>{{ ticket.title }}</td>
                     <td>

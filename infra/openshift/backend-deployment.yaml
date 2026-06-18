@@ -30,7 +30,8 @@ spec:
       containers:
         - name: backend-ai-deskhelp # Container Name
 
-          image: ghcr.io/rashids10/backend-ai-deskhelp:v3 # Docker Image
+          image: ghcr.io/rashids10/backend-ai-deskhelp:v8 # Docker Image
+          imagePullPolicy: Always
 
           ports:
             - containerPort: 8089 # Spring Boot Port
@@ -80,6 +81,9 @@ spec:
 
               - name: OLLAMA_EMBEDDING_MODEL
                 value: nomic-embed-text # Kleines CPU-freundliches Embedding-Modell
+
+              - name: SPRING_AI_VECTORSTORE_PGVECTOR_DIMENSIONS
+                value: "768" # nomic-embed-text erzeugt 768-dimensionale Embeddings
 
               - name: JAVA_TOOL_OPTIONS
                 value: "-Xmx512m" # Java Heap Limit

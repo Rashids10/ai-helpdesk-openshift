@@ -1,6 +1,7 @@
-import { Component, OnDestroy, OnInit, inject } from '@angular/core';
+import { Component, OnDestroy, OnInit, computed, inject, signal } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { HelpdeskApiService, TicketListItem } from '../../api/helpdesk-api.service';
+import { AuthService } from '../../core/auth/auth.service';
 
 interface StatCard {
   label: string;
@@ -16,12 +17,16 @@ interface StatCard {
 })
 export class DashboardPageComponent implements OnInit, OnDestroy {
   private readonly api = inject(HelpdeskApiService);
+  private readonly auth = inject(AuthService);
   private readonly subscriptions = new Subscription();
 
-  protected statCards: StatCard[] = [];
-  protected tickets: TicketListItem[] = [];
-  protected isLoading = true;
-  protected errorMessage = '';
+  protected readonly statCards = signal<StatCard[]>([]);
+  protected readonly tickets = signal<TicketListItem[]>([]);
+  protected readonly isLoading = signal(true);
+  protected readonly errorMessage = signal('');
+  protected readonly hasTickets = computed(() => this.tickets().length > 0);
+  protected readonly welcomeLabel = this.auth.welcomeLabel;
+  protected readonly signedInLabel = this.auth.signedInLabel;
 
   ngOnInit(): void {
     this.subscriptions.add(
@@ -37,35 +42,32 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
     this.subscriptions.unsubscribe();
   }
 
-  protected get hasTickets(): boolean {
-    return this.tickets.length > 0;
-  }
-
   private async loadTickets(): Promise<void> {
-    this.isLoading = true;
-    this.errorMessage = '';
+    this.isLoading.set(true);
+    this.errorMessage.set('');
 
     try {
       const result = await this.api.getMyTickets();
 
       if (!result.response.ok) {
-        this.tickets = [];
-        this.statCards = this.buildStatCards([]);
-        this.errorMessage = this.api.extractErrorMessage(
-          result.body,
-          'Could not load your tickets.',
+        this.tickets.set([]);
+        this.statCards.set(this.buildStatCards([]));
+        this.errorMessage.set(
+          this.api.extractErrorMessage(result.body, 'Could not load your tickets.'),
         );
         return;
       }
 
-      this.tickets = result.tickets;
-      this.statCards = this.buildStatCards(this.tickets);
+      this.tickets.set(result.tickets);
+      this.statCards.set(this.buildStatCards(result.tickets));
     } catch (error) {
-      this.tickets = [];
-      this.statCards = this.buildStatCards([]);
-      this.errorMessage = this.api.extractErrorMessage(error, 'Could not load your tickets.');
+      this.tickets.set([]);
+      this.statCards.set(this.buildStatCards([]));
+      this.errorMessage.set(
+        this.api.extractErrorMessage(error, 'Could not load your tickets.'),
+      );
     } finally {
-      this.isLoading = false;
+      this.isLoading.set(false);
     }
   }
 

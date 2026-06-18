@@ -1,6 +1,7 @@
 import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { filter, Subscription } from 'rxjs';
+import { AuthService } from '../../auth/auth.service';
 import { HeaderComponent } from '../header/header.component';
 import { SidebarComponent } from '../sidebar/sidebar.component';
 
@@ -14,12 +15,14 @@ import { SidebarComponent } from '../sidebar/sidebar.component';
 export class AppLayoutComponent implements OnInit, OnDestroy {
   private readonly router = inject(Router);
   private readonly activatedRoute = inject(ActivatedRoute);
+  private readonly auth = inject(AuthService);
   private readonly subscription = new Subscription();
 
   protected pageTitle = 'Dashboard overview';
 
   ngOnInit(): void {
     this.updatePageTitle();
+    void this.auth.loadCurrentUser();
 
     this.subscription.add(
       this.router.events.pipe(filter((event): event is NavigationEnd => event instanceof NavigationEnd)).subscribe(() => {

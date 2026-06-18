@@ -8,6 +8,7 @@ import {
   Validators,
 } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { AuthService } from '../../core/auth/auth.service';
 import { environment } from '../../../environments/environment';
 
 interface SignupResponse {
@@ -44,6 +45,7 @@ const passwordsMatchValidator: ValidatorFn = (
 export class SignupPageComponent implements OnDestroy {
   private readonly formBuilder = inject(FormBuilder);
   private readonly router = inject(Router);
+  private readonly auth = inject(AuthService);
   private redirectTimeoutId: ReturnType<typeof setTimeout> | null = null;
 
   protected readonly form = this.formBuilder.nonNullable.group(
@@ -116,6 +118,8 @@ export class SignupPageComponent implements OnDestroy {
       const token = this.extractToken(body);
       if (token) {
         localStorage.setItem('accessToken', token);
+        const username = body?.['username'];
+        this.auth.setUsername(typeof username === 'string' ? username : null);
       }
 
       this.successMessage = 'Account created successfully. Redirecting to dashboard...';

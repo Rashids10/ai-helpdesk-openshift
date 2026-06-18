@@ -1,8 +1,9 @@
-import { Component, OnDestroy, OnInit, inject } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
 import { ReactiveFormsModule, Validators } from '@angular/forms';
 import { FormBuilder } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { HelpdeskApiService, TicketListItem } from '../../api/helpdesk-api.service';
+import { AuthService } from '../../core/auth/auth.service';
 
 @Component({
   selector: 'app-ticket-create-page',
@@ -14,6 +15,7 @@ import { HelpdeskApiService, TicketListItem } from '../../api/helpdesk-api.servi
 export class TicketCreatePageComponent implements OnInit, OnDestroy {
   private readonly formBuilder = inject(FormBuilder);
   private readonly api = inject(HelpdeskApiService);
+  private readonly auth = inject(AuthService);
   private readonly subscriptions = new Subscription();
 
   protected readonly form = this.formBuilder.nonNullable.group({
@@ -21,12 +23,13 @@ export class TicketCreatePageComponent implements OnInit, OnDestroy {
     description: ['', [Validators.required, Validators.maxLength(2000)]],
   });
 
-  protected isSubmitting = false;
-  protected successMessage = '';
-  protected errorMessage = '';
-  protected isLoadingTickets = true;
-  protected ticketsErrorMessage = '';
-  protected tickets: TicketListItem[] = [];
+  protected readonly isSubmitting = signal(false);
+  protected readonly successMessage = signal('');
+  protected readonly errorMessage = signal('');
+  protected readonly isLoadingTickets = signal(true);
+  protected readonly ticketsErrorMessage = signal('');
+  protected readonly tickets = signal<TicketListItem[]>([]);
+  protected readonly signedInLabel = this.auth.signedInLabel;
 
   protected get title() {
     return this.form.controls.title;
@@ -52,9 +55,9 @@ export class TicketCreatePageComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.isSubmitting = true;
-    this.successMessage = '';
-    this.errorMessage = '';
+    this.isSubmitting.set(true);
+    this.successMessage.set('');
+    this.errorMessage.set('');
 
     try {
       const { title, description } = this.form.getRawValue();
@@ -64,14 +67,13 @@ export class TicketCreatePageComponent implements OnInit, OnDestroy {
       });
 
       if (!response.ok) {
-        this.errorMessage = this.api.extractErrorMessage(
-          body,
-          'Ticket creation failed. Please try again.',
+        this.errorMessage.set(
+          this.api.extractErrorMessage(body, 'Ticket creation failed. Please try again.'),
         );
         return;
       }
 
-      this.successMessage = 'Ticket created successfully.';
+      this.successMessage.set('Ticket created successfully.');
       this.form.reset({
         title: '',
         description: '',
@@ -80,12 +82,11 @@ export class TicketCreatePageComponent implements OnInit, OnDestroy {
       this.form.markAsUntouched();
       this.api.notifyTicketsChanged();
     } catch (error) {
-      this.errorMessage = this.api.extractErrorMessage(
-        error,
-        'Ticket creation failed. Please try again.',
+      this.errorMessage.set(
+        this.api.extractErrorMessage(error, 'Ticket creation failed. Please try again.'),
       );
     } finally {
-      this.isSubmitting = false;
+      this.isSubmitting.set(false);
     }
   }
 
@@ -94,30 +95,28 @@ export class TicketCreatePageComponent implements OnInit, OnDestroy {
   }
 
   private async loadTickets(): Promise<void> {
-    this.isLoadingTickets = true;
-    this.ticketsErrorMessage = '';
+    this.isLoadingTickets.set(true);
+    this.ticketsErrorMessage.set('');
 
     try {
       const result = await this.api.getMyTickets();
 
       if (!result.response.ok) {
-        this.tickets = [];
-        this.ticketsErrorMessage = this.api.extractErrorMessage(
-          result.body,
-          'Could not load your tickets.',
+        this.tickets.set([]);
+        this.ticketsErrorMessage.set(
+          this.api.extractErrorMessage(result.body, 'Could not load your tickets.'),
         );
         return;
       }
 
-      this.tickets = result.tickets;
+      this.tickets.set(result.tickets);
     } catch (error) {
-      this.tickets = [];
-      this.ticketsErrorMessage = this.api.extractErrorMessage(
-        error,
-        'Could not load your tickets.',
+      this.tickets.set([]);
+      this.ticketsErrorMessage.set(
+        this.api.extractErrorMessage(error, 'Could not load your tickets.'),
       );
     } finally {
-      this.isLoadingTickets = false;
+      this.isLoadingTickets.set(false);
     }
   }
 }

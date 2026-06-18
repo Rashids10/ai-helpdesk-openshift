@@ -35,27 +35,30 @@ spec:
     spec:
       containers:
         - name: ai-deskhelp-db
-          image: registry.redhat.io/rhel8/postgresql-15 # OpenShift-kompatibles PostgreSQL Image
+          image: ghcr.io/rashids10/ai-deskhelp-postgres-pgvector:v1 # PostgreSQL 15 mit pgvector Extension
 
           ports:
             - containerPort: 5432 # PostgreSQL Port im Container
 
           env:
-            - name: POSTGRESQL_DATABASE # DB-Name für Red-Hat-Postgres
+            - name: POSTGRES_DB # DB-Name für offizielles PostgreSQL Image
               value: ai_deskhelp
 
-            - name: POSTGRESQL_USER # DB-User für Red-Hat-Postgres
+            - name: POSTGRES_USER # DB-User für offizielles PostgreSQL Image
               value: rashid
 
-            - name: POSTGRESQL_PASSWORD # DB-Passwort aus Secret
+            - name: POSTGRES_PASSWORD # DB-Passwort aus Secret
               valueFrom:
                 secretKeyRef:
                   name: my-secret-pw
                   key: DB_PASSWORD
 
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
+
           volumeMounts:
             - name: postgres-storage
-              mountPath: /var/lib/pgsql/data # Datenpfad für Red-Hat-Postgres
+              mountPath: /var/lib/postgresql/data # Datenpfad für offizielles PostgreSQL Image
 
           livenessProbe:
             tcpSocket:

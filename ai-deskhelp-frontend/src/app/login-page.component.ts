@@ -2,6 +2,7 @@ import { Component, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { HelpdeskApiService } from './api/helpdesk-api.service';
+import { AuthService } from './core/auth/auth.service';
 
 @Component({
   selector: 'app-login-page',
@@ -14,6 +15,7 @@ export class LoginPageComponent {
   private readonly formBuilder = inject(FormBuilder);
   private readonly router = inject(Router);
   private readonly api = inject(HelpdeskApiService);
+  private readonly auth = inject(AuthService);
 
   protected readonly form = this.formBuilder.nonNullable.group({
     email: ['', [Validators.required, Validators.email]],
@@ -57,6 +59,13 @@ export class LoginPageComponent {
       if (!token) {
         this.errorMessage = 'Login succeeded, but no access token was returned.';
         return;
+      }
+
+      const username = body?.['username'];
+      if (typeof username === 'string') {
+        this.auth.setUsername(username);
+      } else {
+        await this.auth.loadCurrentUser();
       }
 
       await this.router.navigate(['/dashboard'], { replaceUrl: true });

@@ -4,7 +4,7 @@
       <p class="eyebrow">Ticket workspace</p>
       <h1>Create a ticket</h1>
       <p class="summary">
-        Enter a title and description, then submit the ticket for the logged-in user.
+        {{ signedInLabel() }}. Enter a title and description, then submit the ticket.
       </p>
     </div>
 
@@ -44,16 +44,16 @@
         <p class="field-error">Description must be 2000 characters or fewer.</p>
       }
 
-      @if (errorMessage) {
-        <p class="form-error" role="alert">{{ errorMessage }}</p>
+      @if (errorMessage()) {
+        <p class="form-error" role="alert">{{ errorMessage() }}</p>
       }
 
-      @if (successMessage) {
-        <p class="form-success" role="status" aria-live="polite">{{ successMessage }}</p>
+      @if (successMessage()) {
+        <p class="form-success" role="status" aria-live="polite">{{ successMessage() }}</p>
       }
 
-      <button class="submit-button" type="submit" [disabled]="isSubmitting || form.invalid">
-        @if (isSubmitting) {
+      <button class="submit-button" type="submit" [disabled]="isSubmitting() || form.invalid">
+        @if (isSubmitting()) {
           <span class="button-spinner" aria-hidden="true"></span>
           <span>Creating ticket...</span>
         } @else {
@@ -71,11 +71,11 @@
       </div>
     </div>
 
-    @if (ticketsErrorMessage) {
-      <p class="list-error" role="alert">{{ ticketsErrorMessage }}</p>
+    @if (ticketsErrorMessage()) {
+      <p class="list-error" role="alert">{{ ticketsErrorMessage() }}</p>
     }
 
-    @if (isLoadingTickets) {
+    @if (isLoadingTickets()) {
       <p class="list-state">Loading tickets...</p>
     } @else {
       <div class="table-wrap">
@@ -88,12 +88,12 @@
             </tr>
           </thead>
           <tbody>
-            @if (tickets.length === 0) {
+            @if (tickets().length === 0) {
               <tr>
                 <td colspan="3" class="empty-state">No tickets yet</td>
               </tr>
             } @else {
-              @for (ticket of tickets; track ticket.id) {
+              @for (ticket of tickets(); track ticket.id) {
                 <tr>
                   <td>{{ ticket.title }}</td>
                   <td>

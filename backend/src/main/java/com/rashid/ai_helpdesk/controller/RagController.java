@@ -34,7 +34,7 @@ public class RagController {
         List<Document> documents = vectorStore.similaritySearch(SearchRequest.builder()
                 .query(query)
                 .topK(1)
-                .similarityThreshold(0.3)
+                .similarityThreshold(0.3) //Gib mir alle Dokumente zurück, die mindestens 30 % ähnlich zur Benutzerfrage sind
                 .build());
 
         if (documents == null || documents.isEmpty()) {
