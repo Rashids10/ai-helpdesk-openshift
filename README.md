@@ -20,6 +20,18 @@ The RAG assistant reads a Markdown knowledge base, chunks it, creates embeddings
 
 ## Tech Stack
 
+<p align="center">
+  <img src="https://cdn.simpleicons.org/angular/DD0031" alt="Angular" title="Angular" width="52" height="52" />
+  <img src="https://cdn.simpleicons.org/typescript/3178C6" alt="TypeScript" title="TypeScript" width="52" height="52" />
+  <img src="https://cdn.simpleicons.org/reactivex/B7178C" alt="RxJS" title="RxJS" width="52" height="52" />
+  <img src="https://cdn.simpleicons.org/openjdk/FFFFFF" alt="Java" title="Java" width="52" height="52" />
+  <img src="https://cdn.simpleicons.org/spring/6DB33F" alt="Spring Boot" title="Spring Boot" width="52" height="52" />
+  <img src="https://cdn.simpleicons.org/postgresql/4169E1" alt="PostgreSQL and pgvector" title="PostgreSQL and pgvector" width="52" height="52" />
+  <img src="https://cdn.simpleicons.org/ollama/FFFFFF" alt="Ollama" title="Ollama" width="52" height="52" />
+  <img src="https://cdn.simpleicons.org/docker/2496ED" alt="Docker" title="Docker" width="52" height="52" />
+  <img src="https://cdn.simpleicons.org/redhatopenshift/EE0000" alt="OpenShift" title="OpenShift" width="52" height="52" />
+</p>
+
 | Layer | Technology |
 | --- | --- |
 | Frontend | Angular 21, TypeScript, RxJS, Signals |
