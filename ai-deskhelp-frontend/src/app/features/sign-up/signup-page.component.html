@@ -48,8 +48,8 @@
           [attr.aria-invalid]="email.touched && email.invalid"
         />
       </label>
-      @if (emailServerError) {
-        <p class="field-error" role="alert">{{ emailServerError }}</p>
+      @if (emailServerError()) {
+        <p class="field-error" role="alert">{{ emailServerError() }}</p>
       }
       @if (email.touched && email.hasError('required')) {
         <p class="field-error">Email is required.</p>
@@ -185,16 +185,16 @@
         <p class="field-error">Passwords do not match</p>
       }
 
-      @if (errorMessage) {
-        <p class="form-error" role="alert">{{ errorMessage }}</p>
+      @if (errorMessage()) {
+        <p class="form-error" role="alert">{{ errorMessage() }}</p>
       }
 
-      @if (successMessage) {
-        <p class="form-success" role="status" aria-live="polite">{{ successMessage }}</p>
+      @if (successMessage()) {
+        <p class="form-success" role="status" aria-live="polite">{{ successMessage() }}</p>
       }
 
-      <button class="submit-button" type="submit" [disabled]="isSubmitting || form.invalid">
-        @if (isSubmitting) {
+      <button class="submit-button" type="submit" [disabled]="isSubmitting() || form.invalid">
+        @if (isSubmitting()) {
           <span class="button-spinner" aria-hidden="true"></span>
           <span>Creating account...</span>
         } @else {

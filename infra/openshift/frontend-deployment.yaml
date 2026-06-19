@@ -24,7 +24,7 @@ spec:
       #  - name: ghcr-secret
       containers:
         - name: frontend-ai-deskhelp
-          image: ghcr.io/rashids10/frontend-ai-deskhelp:v6
+          image: ghcr.io/rashids10/frontend-ai-deskhelp:v7
           imagePullPolicy: Always
 
           livenessProbe: # Anwendung lebt noch?

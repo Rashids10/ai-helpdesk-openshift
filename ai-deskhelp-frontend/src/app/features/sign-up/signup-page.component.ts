@@ -1,4 +1,5 @@
-import { Component, OnDestroy, inject } from '@angular/core';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { Component, OnDestroy, inject, signal } from '@angular/core';
 import {
   AbstractControl,
   FormBuilder,
@@ -8,6 +9,7 @@ import {
   Validators,
 } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { finalize, take, timeout } from 'rxjs';
 import { AuthService } from '../../core/auth/auth.service';
 import { environment } from '../../../environments/environment';
 
@@ -46,6 +48,7 @@ export class SignupPageComponent implements OnDestroy {
   private readonly formBuilder = inject(FormBuilder);
   private readonly router = inject(Router);
   private readonly auth = inject(AuthService);
+  private readonly http = inject(HttpClient);
   private redirectTimeoutId: ReturnType<typeof setTimeout> | null = null;
 
   protected readonly form = this.formBuilder.nonNullable.group(
@@ -58,10 +61,10 @@ export class SignupPageComponent implements OnDestroy {
     { validators: [passwordsMatchValidator] },
   );
 
-  protected isSubmitting = false;
-  protected errorMessage = '';
-  protected emailServerError = '';
-  protected successMessage = '';
+  protected readonly isSubmitting = signal(false);
+  protected readonly errorMessage = signal('');
+  protected readonly emailServerError = signal('');
+  protected readonly successMessage = signal('');
   protected showPassword = false;
   protected showConfirmPassword = false;
 
@@ -89,50 +92,55 @@ export class SignupPageComponent implements OnDestroy {
     return this.showConfirmPassword ? 'text' : 'password';
   }
 
-  protected async onSubmit(): Promise<void> {
+  protected onSubmit(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
     }
 
-    this.isSubmitting = true;
-    this.errorMessage = '';
-    this.emailServerError = '';
-    this.successMessage = '';
+    this.isSubmitting.set(true);
+    this.errorMessage.set('');
+    this.emailServerError.set('');
+    this.successMessage.set('');
 
-    try {
-      const { email, username, password } = this.form.getRawValue();
-      const { response, body } = await this.submitSignup({
+    const { email, username, password } = this.form.getRawValue();
+
+    this.http.post<SignupResponse>(
+      SIGNUP_ENDPOINT,
+      {
         email,
         username,
         password,
+      },
+      { observe: 'response' },
+    )
+      .pipe(
+        timeout(SIGNUP_REQUEST_TIMEOUT_MS),
+        take(1),
+        finalize(() => {
+          this.isSubmitting.set(false);
+        }),
+      )
+      .subscribe({
+        next: ({ body }) => {
+          const token = this.extractToken(body);
+          if (token) {
+            localStorage.setItem('accessToken', token);
+            const username = body?.['username'];
+            this.auth.setUsername(typeof username === 'string' ? username : null);
+          }
+
+          this.successMessage.set('Account created successfully. Redirecting to dashboard...');
+          this.redirectTimeoutId = setTimeout(() => {
+            void this.router.navigate(['/dashboard'], { replaceUrl: true });
+          }, 900);
+        },
+        error: (error: unknown) => {
+          const backendMessage = this.extractErrorMessage(error);
+          this.emailServerError.set(backendMessage);
+          this.errorMessage.set(backendMessage);
+        },
       });
-
-      if (!response.ok) {
-        const backendMessage = this.extractErrorMessage(body);
-        this.emailServerError = backendMessage;
-        this.errorMessage = backendMessage;
-        return;
-      }
-
-      const token = this.extractToken(body);
-      if (token) {
-        localStorage.setItem('accessToken', token);
-        const username = body?.['username'];
-        this.auth.setUsername(typeof username === 'string' ? username : null);
-      }
-
-      this.successMessage = 'Account created successfully. Redirecting to dashboard...';
-      this.redirectTimeoutId = setTimeout(() => {
-        void this.router.navigate(['/dashboard'], { replaceUrl: true });
-      }, 900);
-    } catch (error) {
-      const backendMessage = this.extractErrorMessage(error);
-      this.emailServerError = backendMessage;
-      this.errorMessage = backendMessage;
-    } finally {
-      this.isSubmitting = false;
-    }
   }
 
   protected togglePasswordVisibility(): void {
@@ -150,40 +158,6 @@ export class SignupPageComponent implements OnDestroy {
     }
   }
 
-  private async submitSignup(payload: {
-    email: string;
-    username: string;
-    password: string;
-  }): Promise<{ response: Response; body: SignupResponse | null }> {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), SIGNUP_REQUEST_TIMEOUT_MS);
-
-    try {
-      const response = await fetch(SIGNUP_ENDPOINT, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload),
-        signal: controller.signal,
-      });
-
-      const body = await this.safeJson(response);
-
-      return { response, body };
-    } finally {
-      clearTimeout(timeoutId);
-    }
-  }
-
-  private async safeJson(response: Response): Promise<SignupResponse | null> {
-    try {
-      return (await response.json()) as SignupResponse;
-    } catch {
-      return null;
-    }
-  }
-
   private extractToken(body: SignupResponse | null): string | null {
     const token = body?.accessToken ?? body?.token ?? body?.jwt;
 
@@ -192,6 +166,23 @@ export class SignupPageComponent implements OnDestroy {
 
   private extractErrorMessage(error: unknown): string {
     const fallback = 'Signup failed. Please try again.';
+
+    if (error instanceof HttpErrorResponse) {
+      if (typeof error.error === 'string' && error.error.trim()) {
+        return error.error;
+      }
+
+      if (error.error && typeof error.error === 'object') {
+        const backendMessage = (error.error as { message?: unknown }).message;
+        if (typeof backendMessage === 'string' && backendMessage.trim()) {
+          return backendMessage;
+        }
+      }
+
+      if (error.message?.trim()) {
+        return error.message;
+      }
+    }
 
     if (!error || typeof error !== 'object') {
       return fallback;
