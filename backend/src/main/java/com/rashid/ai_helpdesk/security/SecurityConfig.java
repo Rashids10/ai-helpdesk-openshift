@@ -53,7 +53,8 @@ public class SecurityConfig{
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers(      // Diese Endpoints dürfen OHNE Login/JWT benutzt werden.
-                                "/api/auth/**",
+                                "/api/auth/login",
+                                "/api/auth/signup",
                                 "/rag/ask",   
                                 "/rag/bot",  
                                 "/v3/api-docs/**",

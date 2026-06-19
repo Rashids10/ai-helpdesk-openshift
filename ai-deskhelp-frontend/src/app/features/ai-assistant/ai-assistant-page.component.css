@@ -25,6 +25,12 @@
   gap: 1rem;
 }
 
+.user-context {
+  margin: 0 0 1rem;
+  color: var(--text-muted);
+  font-size: 0.92rem;
+}
+
 .field {
   display: grid;
   gap: 0.45rem;

@@ -1,22 +1,35 @@
 #!/bin/bash
-eval $(minikube -p minikube docker-env)
+
 set -euo pipefail # "Wenn ein Befehl fehlschlägt, beende das Skript sofort." 
 
-docker build \
+docker build --platform linux/amd64 \
   -t backend-ai-deskhelp:latest \
   -f ../backend/backend-docker/Dockerfile ..
 
-docker build \
+docker build --platform linux/amd64 \
   -t frontend-ai-deskhelp:latest \
   -f ../ai-deskhelp-frontend/frontend-Docker-file/Dockerfile ..
 
-# minikube addons enable ingress : nur einmalig notwendig, damit Ingress Controller installiert wird
+
+
+VERSION="${VERSION:-v2}"
+
+docker tag backend-ai-deskhelp:latest ghcr.io/rashids10/backend-ai-deskhelp:$VERSION
+docker push ghcr.io/rashids10/backend-ai-deskhelp:$VERSION
+
+docker tag frontend-ai-deskhelp:latest ghcr.io/rashids10/frontend-ai-deskhelp:$VERSION
+docker push ghcr.io/rashids10/frontend-ai-deskhelp:$VERSION
+
+## dann in deploeymentes den richtigen Namen einfügen
+
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)" #Dirname : dirname = Entferne den Dateinamen und gib nur den Ordner zurück
 
-kubectl apply -f "$SCRIPT_DIR/k8s/db-deployment.yaml" # was ausgeführt wird /Users/abdirashid.farah/work/ai-helpdesk/infra/k8s/db-deployment.yaml
-kubectl apply -f "$SCRIPT_DIR/k8s/frontend-deployment.yaml"
-kubectl apply -f "$SCRIPT_DIR/k8s/ollama-deyployment.yaml"
-kubectl apply -f "$SCRIPT_DIR/k8s/backend-deployment.yaml"
-kubectl apply -f "$SCRIPT_DIR/k8s/web-ingress.yaml"
+# oc apply -f "$SCRIPT_DIR/openshift/configmap.yaml"
+# oc apply -f "$SCRIPT_DIR/openshift/secret.yaml"
 
+oc apply -f "$SCRIPT_DIR/openshift/db-deployment.yaml" # was ausgeführt wird /Users/abdirashid.farah/work/ai-helpdesk/infra/openshift/db-deployment.yaml
+oc apply -f "$SCRIPT_DIR/openshift/backend-deployment.yaml"
+oc apply -f "$SCRIPT_DIR/openshift/frontend-deployment.yaml"
+oc apply -f "$SCRIPT_DIR/openshift/ollama-deyployment.yaml"
+oc apply -f "$SCRIPT_DIR/openshift/route.yaml"

@@ -97,7 +97,8 @@ protected boolean shouldNotFilter(HttpServletRequest request) {
     String path = request.getServletPath();
 
     // Öffentliche Endpoints überspringen
-    return path.startsWith("/api/auth/")
+    return path.equals("/api/auth/login")
+            || path.equals("/api/auth/signup")
             || path.equals("/rag/ask")
             || path.equals("/rag/bot")
             || path.startsWith("/v3/api-docs/")

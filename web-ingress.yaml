@@ -1,0 +1,47 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: backend-api-route
+  annotations:
+    haproxy.router.openshift.io/timeout: 15m
+spec:
+  host: ai-deskhelp.apps.company.com
+  path: /api
+  to:
+    kind: Service
+    name: backend-service
+  port:
+    targetPort: http
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: backend-rag-route
+  annotations:
+    haproxy.router.openshift.io/timeout: 15m
+spec:
+  host: ai-deskhelp.apps.company.com
+  path: /rag
+  to:
+    kind: Service
+    name: backend-service
+  port:
+    targetPort: http
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: frontend-route
+  annotations:
+    haproxy.router.openshift.io/timeout: 5m
+spec:
+  host: ai-deskhelp.apps.company.com
+  path: /
+  to:
+    kind: Service
+    name: frontend-service
+  port:
+    targetPort: 8080
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect

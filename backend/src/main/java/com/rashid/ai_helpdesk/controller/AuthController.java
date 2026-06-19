@@ -134,6 +134,10 @@ return ResponseEntity.status(HttpStatus.CREATED)
 public ResponseEntity<String> getUsername(
         @AuthenticationPrincipal UserDetailsImpl user) {
 
+    if (user == null) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized.");
+    }
+
     return ResponseEntity.ok(user.getUsername());
 }
 }
